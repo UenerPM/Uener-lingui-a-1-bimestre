@@ -343,7 +343,7 @@ if (logoImg) {
           const item = document.createElement("div");
           item.className = "produto";
           item.innerHTML = `
-            <img src="../img/Kid.jpg" alt="Linguiça Apimentada" />
+            <img src="img/Kid.jpg" alt="Linguiça Apimentada" />
             <h3>Linguiça do Kid Bengala🔥(30cm)</h3>
             <p>R$ 999,99</p>
             <button class="remover" data-nome="Linguiça do Kid Bengala">−</button>
