@@ -1,5 +1,3 @@
-// JS principal para todas as páginas: index, confirmação e pagamento
-
 // Recupera o carrinho do localStorage ou retorna um objeto vazio
 function getCarrinho() {
   return JSON.parse(localStorage.getItem("carrinho")) || {};
@@ -11,7 +9,6 @@ function salvarCarrinho(carrinho) {
 }
 
 // Limpa o carrinho e a forma de pagamento do localStorage
-
 function limparCarrinho() {
   localStorage.removeItem("carrinho");
   localStorage.removeItem("formaPagamento");
@@ -31,14 +28,12 @@ function atualizarCarrinhoDOM(listaSelector, totalSelector) {
     return;
   }
 
-  // Adiciona cada item do carrinho na lista
   Object.entries(carrinho).forEach(([nome, item]) => {
     const subtotal = item.preco * item.quantidade;
     lista.innerHTML += `<li>${nome} x${item.quantidade} – R$ ${subtotal.toFixed(2)}</li>`;
     total += subtotal;
   });
 
-  // Atualiza o total se um seletor foi passado
   if (totalSelector) {
     document.querySelector(totalSelector).textContent = `R$ ${total.toFixed(2)}`;
   }
@@ -47,46 +42,48 @@ function atualizarCarrinhoDOM(listaSelector, totalSelector) {
 // Configura a página inicial (index.html) para manipular itens do carrinho
 function setupIndexPage() {
   // Esvazia o carrinho apenas se o usuário recarregar a página (F5 ou Ctrl+R)
-if (performance.getEntriesByType("navigation")[0].type === "reload") {
-  limparCarrinho();
-}
+  if (performance.getEntriesByType("navigation")[0].type === "reload") {
+    limparCarrinho();
+  }
 
-  const botoesAdicionar = document.querySelectorAll(".adicionar");
-  const botoesRemover = document.querySelectorAll(".remover");
-  const linkConfirmar = document.getElementById("confirmar-pedido");
-
-  // Botão de adicionar item
-  botoesAdicionar.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const nome = btn.dataset.nome;
-      const preco = parseFloat(btn.dataset.preco);
+  // Usamos event delegation para garantir que cada clique adicione/remova apenas 1 item
+  const produtosContainer = document.querySelector('.produtos');
+  if (produtosContainer && !produtosContainer.dataset.inited) {
+    produtosContainer.addEventListener('click', event => {
+      const target = event.target;
       const carrinho = getCarrinho();
 
-      carrinho[nome] = carrinho[nome] || { quantidade: 0, preco };
-      carrinho[nome].quantidade++;
-      salvarCarrinho(carrinho);
+      if (target.classList.contains('adicionar')) {
+        const nome = target.dataset.nome;
+        const preco = parseFloat(target.dataset.preco);
 
-      document.querySelector(`.quantidade[data-nome="${nome}"]`).textContent = carrinho[nome].quantidade;
-      atualizarCarrinhoDOM("#carrinho-lista");
-    });
-  });
-
-  // Botão de remover item
-  botoesRemover.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const nome = btn.dataset.nome;
-      const carrinho = getCarrinho();
-      if (carrinho[nome]) {
-        carrinho[nome].quantidade--;
-        if (carrinho[nome].quantidade <= 0) delete carrinho[nome];
+        carrinho[nome] = carrinho[nome] || { quantidade: 0, preco };
+        carrinho[nome].quantidade++;
         salvarCarrinho(carrinho);
-        document.querySelector(`.quantidade[data-nome="${nome}"]`).textContent = carrinho[nome]?.quantidade || 0;
+
+        document.querySelector(`.quantidade[data-nome="${nome}"]`).textContent = carrinho[nome].quantidade;
         atualizarCarrinhoDOM("#carrinho-lista");
       }
+
+      if (target.classList.contains('remover')) {
+        const nome = target.dataset.nome;
+
+        if (carrinho[nome]) {
+          carrinho[nome].quantidade--;
+          if (carrinho[nome].quantidade <= 0) delete carrinho[nome];
+          salvarCarrinho(carrinho);
+
+          document.querySelector(`.quantidade[data-nome="${nome}"]`).textContent = carrinho[nome]?.quantidade || 0;
+          atualizarCarrinhoDOM("#carrinho-lista");
+        }
+      }
     });
-  });
+
+    produtosContainer.dataset.inited = 'true';
+  }
 
   // Verifica se o carrinho está vazio ao confirmar
+  const linkConfirmar = document.getElementById("confirmar-pedido");
   if (linkConfirmar) {
     linkConfirmar.addEventListener("click", e => {
       if (Object.keys(getCarrinho()).length === 0) {
@@ -107,7 +104,6 @@ function setupConfirmacaoPage() {
   const carrinho = getCarrinho();
   let total = 0;
 
-  // Mostra os itens do carrinho na tela
   if (lista) {
     lista.innerHTML = "";
     if (Object.keys(carrinho).length === 0) {
@@ -122,7 +118,6 @@ function setupConfirmacaoPage() {
     }
   }
 
-  // Finaliza o pedido e salva a forma de pagamento
   if (btnFinalizar) {
     btnFinalizar.addEventListener("click", () => {
       if (Object.keys(carrinho).length === 0) {
@@ -135,7 +130,7 @@ function setupConfirmacaoPage() {
   }
 }
 
-// Permite apenas digitos numéricos em campos específicos
+// Permite apenas dígitos numéricos em campos específicos
 function somenteDigitos(e) {
   if (![8, 46].includes(e.keyCode) && (e.keyCode < 48 || e.keyCode > 57)) {
     e.preventDefault();
@@ -228,13 +223,11 @@ function setupPagamentoPage() {
 
   const total = Object.values(carrinho).reduce((sum, item) => sum + item.preco * item.quantidade, 0);
 
-  // Atualiza valor do total na tela
   const totalFormattedEl = document.getElementById("total-formatted");
   if (totalFormattedEl) {
     totalFormattedEl.textContent = `R$ ${total.toFixed(2)}`;
   }
 
-  // Se método for PIX, gera o QR Code
   if (metodo === "PIX") {
     const chavePix = "uperesmarcon@gmail.com";
     const nome = "Uener Linguucudo";
@@ -248,7 +241,6 @@ function setupPagamentoPage() {
       qrImg.src = qrUrl;
     }
   } else {
-    // Se for cartão, exibe o formulário
     conteudo.innerHTML = `
       <form id="form-cartao">
         <div class="form-group">
@@ -263,9 +255,9 @@ function setupPagamentoPage() {
           <label for="cvv">CVV:</label>
           <input type="text" id="cvv" placeholder="123" maxlength="4" required>
         </div>
-      </form>`;
+      </form>
+    `;
 
-    // Aplica máscara e restrição aos campos
     ["numero-cartao", "validade", "cvv"].forEach(id => {
       const inp = document.getElementById(id);
       inp.addEventListener("keydown", somenteDigitos);
@@ -285,7 +277,6 @@ function setupPagamentoPage() {
     });
   }
 
-  // Validação e finalização do pagamento
   btnConcluir.addEventListener("click", () => {
     const form = document.getElementById("form-cartao");
     if (form) {
@@ -293,21 +284,17 @@ function setupPagamentoPage() {
       const val = document.getElementById("validade").value;
       const cvv = document.getElementById("cvv").value;
 
-      // Valida número de cartão
       if (!num || num.length < 13 || !luhnCheck(num)) {
         return alert("Número de cartão inválido!");
       }
-      // Valida validade
       if (!validarValidade(val)) {
         return alert("Validade inválida ou expirada!");
       }
-      // Valida CVV
       if (!validarCVV(cvv)) {
         return alert("CVV inválido!");
       }
     }
 
-    // Finaliza o pedido
     limparCarrinho();
     conteudo.style.display = "none";
     btnConcluir.style.display = "none";
@@ -336,40 +323,38 @@ if (logoImg) {
           const item = document.createElement("div");
           item.className = "produto";
           item.innerHTML = `
-          <img src="img\uener.jpg" alt="Linguiça Apimentada" />
+            <img src="img/uener.jpg" alt="Linguiça Apimentada" />
             <h3>Linguiça do Chefe 🔥</h3>
             <p>R$ 999,99</p>
-                        <button class="remover" data-nome="Linguiça do Chefe">-</button>
-                        <span class="quantidade" data-nome="Linguiça do Chefe">0</span>
-                                    <button class="adicionar" data-nome="Linguiça do Chefe" data-preco="999.99">+</button>
-
+            <button class="remover" data-nome="Linguiça do Chefe">−</button>
+            <span class="quantidade" data-nome="Linguiça do Chefe">0</span>
+            <button class="adicionar" data-nome="Linguiça do Chefe" data-preco="999.99">+</button>
           `;
           lista.appendChild(item);
           alert("🔥 Você desbloqueou a Linguiça do Chefe!");
-          setupIndexPage(); // ativa eventos nos novos botões
+          // Não precisa chamar setupIndexPage de novo, pois usamos delegation
         }
       }
     }
     if (cliqueLogo === 30) {
-      if (!document.querySelector("[data-nome='Linguiça do Kid']")) {
+      if (!document.querySelector("[data-nome='Linguiça do Kid Bengala']")) {
         const lista = document.querySelector(".produtos") || document.getElementById("lista-produtos");
         if (lista) {
           const item = document.createElement("div");
           item.className = "produto";
           item.innerHTML = `
-          <img src="../img/Kid.jpg" alt="Linguiça Apimentada" />
+            <img src="../img/Kid.jpg" alt="Linguiça Apimentada" />
             <h3>Linguiça do Kid Bengala🔥(30cm)</h3>
             <p>R$ 999,99</p>
-            <button class="remover" data-nome="Linguiça do Kid Bengala">-</button>
-           <span class="quantidade" data-nome="Linguiça do Kid Bengala">0</span>
+            <button class="remover" data-nome="Linguiça do Kid Bengala">−</button>
+            <span class="quantidade" data-nome="Linguiça do Kid Bengala">0</span>
             <button class="adicionar" data-nome="Linguiça do Kid Bengala" data-preco="999.99">+</button>
           `;
           lista.appendChild(item);
           alert("🔥 Você desbloqueou a Linguiça do Kid Bengala!(30 cliques = 30 centimetros)");
-          setupIndexPage(); // ativa eventos nos novos botões
+          // A delegation já está ativa
         }
       }
     }
   });
 }
-

@@ -17,7 +17,9 @@ header {
   text-align: center;
   font-family: 'Luckiest Guy', cursive;
 }
-
+#header-title {
+  cursor: pointer;
+}
 .back-button {
   position: absolute;
   left: 20px;
