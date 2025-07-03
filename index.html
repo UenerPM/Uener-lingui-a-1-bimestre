@@ -5,81 +5,210 @@
   <title>Uener Linguço</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <style>
+    body {
+      background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      color: #232526;
+    }
+    header {
+      background: #bb3e03;
+      color: #fff;
+      padding: 24px 0 12px 0;
+      text-align: center;
+      border-bottom: 4px solid #fff;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    header .logo {
+      height: 60px;
+      margin-bottom: 8px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      margin: 0;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    header .subtitulo {
+      color: #fff7e6;
+      font-size: 1.1rem;
+      margin-top: 6px;
+      margin-bottom: 0;
+    }
+    .produtos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .produto {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #0002;
+      padding: 18px 18px 14px 18px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .produto:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 6px 24px #bb3e0340;
+    }
+    .produto img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px #bb3e0320;
+    }
+    .produto h3 {
+      color: #bb3e03;
+      margin: 0 0 4px 0;
+      font-size: 1.1rem;
+    }
+    .produto p {
+      color: #bb3e03;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      font-size: 1.1rem;
+    }
+    .controle-qtd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .controle-qtd button {
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .controle-qtd button:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 1px solid #bb3e03;
+    }
+    .carrinho {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #bb3e0320;
+      padding: 24px 20px 16px 20px;
+      max-width: 400px;
+      margin: 0 auto 32px auto;
+    }
+    .carrinho h2 {
+      color: #bb3e03;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    #carrinho-lista {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px 0;
+      color: #232526;
+    }
+    #confirmar-pedido {
+      display: block;
+      width: 100%;
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 10px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #confirmar-pedido:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 1px solid #bb3e03;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+    .logout-btn:hover {
+      color: #bb3e03;
+    }
+    @media (max-width: 700px) {
+      .produtos {
+        flex-direction: column;
+        align-items: center;
+      }
+      .carrinho {
+        max-width: 98vw;
+      }
+    }
+  </style>
 </head>
 <body>
+  <script>
+    fetch('/api/session')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username && !window.location.pathname.endsWith('login.html')) {
+          window.location.replace('/login.html');
+        }
+      });
+  </script>
   <header>
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" id="logo-img">
     <h1 class="titulo-estilizado">Uener Linguço</h1>
     <p class="subtitulo">As melhores linguiças direto da grelha pra você!</p>
   </header>
-
   <main>
-    <section class="produtos">
-      <div class="produto">
-        <img src="img/toscana.jpg" alt="Linguiça Toscana" />
-        <h3>Linguiça Toscana</h3>
-        <p>R$ 20,00</p>
-        <div class="controle-qtd">
-          <button class="remover" data-nome="Linguiça Toscana">−</button>
-          <span class="quantidade" data-nome="Linguiça Toscana">0</span>
-          <button class="adicionar" data-nome="Linguiça Toscana" data-preco="20">+</button>
-        </div>
-      </div>
-    
-      <div class="produto">
-        <img src="img/apimentada.jpg" alt="Linguiça Apimentada" />
-        <h3>Linguiça Apimentada</h3>
-        <p>R$ 22,00</p>
-        <div class="controle-qtd">
-          <button class="remover" data-nome="Linguiça Apimentada">−</button>
-          <span class="quantidade" data-nome="Linguiça Apimentada">0</span>
-          <button class="adicionar" data-nome="Linguiça Apimentada" data-preco="22">+</button>
-        </div>
-      </div>
-    
-      <div class="produto">
-        <img src="img/queijo.jpg" alt="Linguiça com Queijo" />
-        <h3>Linguiça com Queijo</h3>
-        <p>R$ 25,00</p>
-        <div class="controle-qtd">
-          <button class="remover" data-nome="Linguiça com Queijo">−</button>
-          <span class="quantidade" data-nome="Linguiça com Queijo">0</span>
-          <button class="adicionar" data-nome="Linguiça com Queijo" data-preco="25">+</button>
-        </div>
-      </div>
-    
-      <div class="produto">
-        <img src="img/defumada.jpg" alt="Linguiça Defumada" />
-        <h3>Linguiça Defumada</h3>
-        <p>R$ 24,00</p>
-        <div class="controle-qtd">
-          <button class="remover" data-nome="Linguiça Defumada">−</button>
-          <span class="quantidade" data-nome="Linguiça Defumada">0</span>
-          <button class="adicionar" data-nome="Linguiça Defumada" data-preco="24">+</button>
-        </div>
-      </div>
-    
-      <div class="produto">
-        <img src="img/caseira.jpg" alt="Linguiça Caseira" />
-        <h3>Linguiça Caseira</h3>
-        <p>R$ 19,00</p>
-        <div class="controle-qtd">
-          <button class="remover" data-nome="Linguiça Caseira">−</button>
-          <span class="quantidade" data-nome="Linguiça Caseira">0</span>
-          <button class="adicionar" data-nome="Linguiça Caseira" data-preco="19">+</button>
-        </div>
-      </div>
+    <section class="produtos" id="produtos-lista">
+      <!-- Produtos serão carregados via JS -->
     </section>
-    
-
     <section class="carrinho">
       <h2>Carrinho</h2>
       <ul id="carrinho-lista"></ul>
-      <!-- vai para confirmação -->
       <a href="confirmacao.html" id="confirmar-pedido" class="botao">Confirmar Pedido</a>
     </section>
   </main>
-
   <script src="js/script.js"></script>
+  <script src="js/admin_button.js"></script>
+  <script>
+    fetch('/api/session')
+      .then(res => res.json())
+      .then(data => {
+        if (data.username) {
+          const header = document.querySelector('header');
+          const userSpan = document.createElement('span');
+          userSpan.textContent = `Usuário: ${data.username}`;
+          userSpan.style = 'position:absolute;top:24px;left:32px;font-weight:bold;color:#fff;background:#bb3e03;padding:4px 12px;border-radius:8px;';
+          header.appendChild(userSpan);
+          const btn = document.createElement('a');
+          btn.href = '/logout';
+          btn.textContent = 'Sair';
+          btn.className = 'logout-btn';
+          header.appendChild(btn);
+        }
+      });
+  </script>
 </body>
 </html>

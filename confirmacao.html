@@ -6,8 +6,111 @@
   <title>Confirmação do Pedido</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <style>
+    body {
+      background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #232526;
+    }
+    header {
+      background: #bb3e03;
+      color: #fff;
+      padding: 24px 0 12px 0;
+      text-align: center;
+      border-bottom: 4px solid #fff;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .back-button {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      color: #bb3e03;
+      border: 2px solid #bb3e03;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      padding: 6px 16px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-button:hover {
+      background: #bb3e03;
+      color: #fff;
+    }
+    .logo {
+      height: 60px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin: 0;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    main {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 32px 16px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #bb3e0330;
+    }
+    h2 {
+      color: #bb3e03;
+      margin-bottom: 16px;
+    }
+    #confirmacao-lista {
+      background: #fff7e6;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      border: 1px solid #bb3e03;
+    }
+    .botao, #btn-finalizar {
+      width: 100%;
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-top: 18px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px #bb3e0330;
+      cursor: pointer;
+    }
+    .botao:hover, #btn-finalizar:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 2px solid #bb3e03;
+    }
+    label {
+      font-size: 1.1rem;
+      color: #bb3e03;
+      margin-right: 16px;
+      cursor: pointer;
+    }
+    input[type="radio"] {
+      accent-color: #bb3e03;
+      margin-right: 8px;
+    }
+  </style>
 </head>
 <body>
+  <script>
+    fetch('/api/session')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username && !window.location.pathname.endsWith('login.html')) {
+          window.location.replace('/login.html');
+        }
+      });
+  </script>
   <header>
     <button class="back-button" onclick="window.history.back()">← Voltar</button>
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
@@ -22,7 +125,7 @@
 
     <section>
       <h2>Forma de Pagamento:</h2>
-      <label><input type="radio" name="pagamento" value="PIX" checked /> PIX</label><br/>
+      <label><input type="radio" name="pagamento" value="PIX" checked /> PIX</label>
       <label><input type="radio" name="pagamento" value="Cartão de Crédito" /> Cartão de Crédito</label>
     </section>
 

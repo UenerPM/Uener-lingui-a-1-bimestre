@@ -1,0 +1,4 @@
+Execute o comando abaixo no terminal para instalar o session-file-store:
+npm install session-file-store
+
+Depois, o backend já estará pronto para manter sessões mesmo após reiniciar o servidor.

@@ -6,8 +6,105 @@
   <title>Uener Linguço — Pagamento</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <style>
+    body {
+      background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #232526;
+    }
+    .header {
+      background: #bb3e03;
+      color: #fff;
+      padding: 24px 0 12px 0;
+      text-align: center;
+      border-bottom: 4px solid #fff;
+      margin-bottom: 24px;
+    }
+    .header-title {
+      font-size: 2.2rem;
+      margin: 0;
+      letter-spacing: 2px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 32px 16px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #bb3e0330;
+    }
+    .payment h2 {
+      color: #bb3e03;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .qrcode-container img {
+      border: 2px solid #bb3e03;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: #fff7e6;
+    }
+    #btn-concluir {
+      width: 100%;
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-top: 18px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px #bb3e0330;
+    }
+    #btn-concluir:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 2px solid #bb3e03;
+    }
+    #mensagem-final {
+      background: #f5e7d3;
+      color: #bb3e03;
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px #bb3e0330;
+    }
+    #mensagem-final button {
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 16px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #mensagem-final button:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 2px solid #bb3e03;
+    }
+  </style>
 </head>
 <body>
+  <script>
+    fetch('/api/session')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username && !window.location.pathname.endsWith('login.html')) {
+          window.location.replace('/login.html');
+        }
+      });
+  </script>
+
   <header class="header">
     <h1 class="header-title" id="header-title" onclick="window.location.href='index.html'">Uener Linguço</h1>
   </header>
@@ -38,9 +135,6 @@
     </section>
   </main>
 
-  <script>
-    console.log('Pagamento.html carregado');
-  </script>
   <script src="js/script.js"></script>
 </body>
 </html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Uener Linguço</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <style>
+    body.login-page {
+      background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px #bb3e0320;
+      padding: 40px 32px 32px 32px;
+      width: 100%;
+      max-width: 370px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .login-container .logo {
+      height: 60px;
+      margin-bottom: 12px;
+    }
+    .login-container h1 {
+      font-size: 2rem;
+      margin-bottom: 18px;
+      color: #bb3e03;
+      letter-spacing: 1px;
+    }
+    .login-form, .register-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .login-form input, .register-form input {
+      border-radius: 6px;
+      border: 1.5px solid #bb3e03;
+      padding: 10px;
+      font-size: 1rem;
+      background: #f5e7d3;
+      color: #bb3e03;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .login-form input:focus, .register-form input:focus {
+      border: 2px solid #bb3e03;
+      background: #fff;
+      color: #bb3e03;
+    }
+    .login-form button, .register-form button {
+      background: #bb3e03;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .login-form button:hover, .register-form button:hover {
+      background: #fff;
+      color: #bb3e03;
+      border: 1px solid #bb3e03;
+    }
+    .adm-info {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #bb3e03;
+      text-align: center;
+    }
+    .adm-info span {
+      color: #bb3e03;
+      font-weight: bold;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      color: #bb3e03;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+    .logout-btn:hover {
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body class="login-page">
+  <script>
+    // Redireciona imediatamente para login se não estiver logado (exceto na própria login.html)
+    fetch('/api/session')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.username && !window.location.pathname.endsWith('login.html')) {
+          window.location.replace('/login.html');
+        }
+      });
+  </script>
+  <div class="login-container">
+    <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
+    <h1>Entrar</h1>
+    <form class="login-form" method="POST" action="/login">
+      <label for="username">Usuário</label>
+      <input type="text" id="username" name="username" required />
+      <label for="password">Senha</label>
+      <input type="password" id="password" name="password" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <form class="register-form" method="POST" action="/register">
+      <label for="new-username">Criar novo usuário</label>
+      <input type="text" id="new-username" name="username" required placeholder="Usuário" />
+      <input type="password" id="new-password" name="password" required placeholder="Senha" />
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div class="adm-info">
+      <p><strong>Usuário administrador:</strong> <span>adm</span></p>
+      <p>Use o usuário <b>adm</b> para acessar funções administrativas.</p>
+    </div>
+    <a href="/logout" class="logout-btn">Logout</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "username": "adm",
+      "password": "123",
+      "isAdmin": true
+    },
+    {
+      "username": "pablo",
+      "password": "123",
+      "isAdmin": true,
+      "bloqueado": false
+    },
+    {
+      "username": "uener fodao",
+      "password": "123",
+      "isAdmin": true
+    },
+    {
+      "username": "bundão",
+      "password": "123",
+      "isAdmin": false,
+      "bloqueado": false
+    },
+    {
+      "username": "victor",
+      "password": "bolas",
+      "isAdmin": false,
+      "bloqueado": false
+    },
+    {
+      "username": "julia",
+      "password": "123",
+      "isAdmin": true,
+      "bloqueado": true
+    }
+  ],
+  "linguicas": [
+    {
+      "id": 1,
+      "nome": "tosacaneto",
+      "preco": "123",
+      "imagem": "1.png"
+    },
+    {
+      "id": 2,
+      "nome": "bolas",
+      "preco": "123",
+      "imagem": "2.jpg"
+    },
+    {
+      "id": 3,
+      "nome": "de frango",
+      "preco": "12",
+      "imagem": "3.jpg"
+    },
+    {
+      "id": 4,
+      "nome": "de queijo",
+      "preco": "123",
+      "imagem": "4.jpg"
+    },
+    {
+      "id": 5,
+      "nome": "pablo",
+      "preco": "0.1",
+      "imagem": "5.jpg"
+    },
+    {
+      "id": 6,
+      "nome": "mista modificada",
+      "preco": "10",
+      "imagem": "6.jpg"
+    },
+    {
+      "id": 7,
+      "nome": "mista modificada 2",
+      "preco": "1",
+      "imagem": "7.jpg"
+    },
+    {
+      "id": 8,
+      "nome": "deedd",
+      "preco": "1111111",
+      "imagem": "8.jpg"
+    },
+    {
+      "id": 9,
+      "nome": "dwqadwq",
+      "preco": "12",
+      "imagem": "9.jpg"
+    }
+  ]
+}

@@ -302,11 +302,31 @@ function setupPagamentoPage() {
   });
 }
 
+// Carrega os produtos disponíveis da API e renderiza na página
+async function carregarProdutos() {
+  const res = await fetch('/api/linguicas');
+  const linguicas = await res.json();
+  const container = document.getElementById('produtos-lista');
+  container.innerHTML = linguicas.map(l => `
+    <div class="produto">
+      <img src="img/${l.imagem}" alt="Linguiça ${l.nome}" />
+      <h3>Linguiça ${l.nome}</h3>
+      <p>R$ ${Number(l.preco).toFixed(2).replace('.', ',')}</p>
+      <div class="controle-qtd">
+        <button class="remover btn-carrinho" data-nome="Linguiça ${l.nome}" aria-label="Remover uma unidade">−</button>
+        <span class="quantidade quantidade-carrinho" data-nome="Linguiça ${l.nome}">0</span>
+        <button class="adicionar btn-carrinho" data-nome="Linguiça ${l.nome}" data-preco="${l.preco}" aria-label="Adicionar uma unidade">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 // Inicializa os comportamentos conforme a página atual
 document.addEventListener("DOMContentLoaded", () => {
   setupIndexPage();
   setupConfirmacaoPage();
   setupPagamentoPage();
+  carregarProdutos();
 });
 
 // Easter Egg: 17 cliques na imagem do logo desbloqueiam a Linguiça do Chefe
