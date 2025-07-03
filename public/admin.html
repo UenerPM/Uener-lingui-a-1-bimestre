@@ -1,13 +1,21 @@
+<!--
+  Painel de Administração do sistema Uener Linguço
+  - Permite gerenciar usuários (adicionar, bloquear, promover, etc.)
+  - Permite gerenciar linguiças (adicionar, editar, remover)
+  - Exibe usuário logado e links de navegação
+-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel de Administração - Uener Linguço</title>
+  <!-- Importa o CSS principal -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
 </head>
 <body class="admin-page">
+  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
     fetch('/api/session')
       .then(res => res.json())
@@ -18,12 +26,14 @@
       });
   </script>
   <header class="admin-header">
+    <!-- Logo e título do painel -->
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
     <h1>Painel de Administração</h1>
     <a href="/index.html">Voltar ao site</a>
     <a href="/logout">Sair</a>
   </header>
   <main>
+    <!-- Seção de gerenciamento de usuários -->
     <section class="admin-section">
       <h2>Gerenciar Usuários</h2>
       <div id="usuarios-lista"></div>
@@ -33,6 +43,7 @@
         <button type="submit">Adicionar Usuário</button>
       </form>
     </section>
+    <!-- Seção de gerenciamento de linguiças -->
     <section class="admin-section">
       <h2>Gerenciar Linguiças</h2>
       <div id="linguicas-lista"></div>
@@ -45,7 +56,9 @@
       <div id="edit-linguica-modal" style="display:none;"></div>
     </section>
   </main>
+  <!-- Script principal do painel admin -->
   <script src="js/admin.js"></script>
+  <!-- Exibe usuário logado no topo -->
   <script>
     fetch('/api/session')
       .then(res => res.json())

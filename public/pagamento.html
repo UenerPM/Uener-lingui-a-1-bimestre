@@ -1,12 +1,21 @@
+<!--
+  Página de Pagamento do sistema Uener Linguço
+  - Exibe QR Code PIX e valor total
+  - Permite concluir o pagamento
+  - Exibe mensagem de sucesso após pagamento
+  - Redireciona para login se não autenticado
+-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Uener Linguço — Pagamento</title>
+  <!-- Importa o CSS principal -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
   <style>
+    /* Estilos específicos da página de pagamento */
     body {
       background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
       min-height: 100vh;
@@ -95,6 +104,7 @@
   </style>
 </head>
 <body>
+  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
     fetch('/api/session')
       .then(res => res.json())
@@ -106,6 +116,7 @@
   </script>
 
   <header class="header">
+    <!-- Logo e título -->
     <h1 class="header-title" id="header-title" onclick="window.location.href='index.html'">Uener Linguço</h1>
   </header>
 
@@ -135,6 +146,7 @@
     </section>
   </main>
 
+  <!-- Script principal da página de pagamento -->
   <script src="js/script.js"></script>
 </body>
 </html>

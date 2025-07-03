@@ -1,12 +1,20 @@
+<!--
+  Página de Login do sistema Uener Linguço
+  - Permite login e cadastro de novos usuários
+  - Exibe informações sobre o usuário administrador
+  - Redireciona para login se não autenticado
+-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Uener Linguço</title>
+  <!-- Importa o CSS principal -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
   <style>
+    /* Estilos específicos da página de login */
     body.login-page {
       background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
       min-height: 100vh;
@@ -100,6 +108,7 @@
   </style>
 </head>
 <body class="login-page">
+  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
     // Redireciona imediatamente para login se não estiver logado (exceto na própria login.html)
     fetch('/api/session')
@@ -111,8 +120,10 @@
       });
   </script>
   <div class="login-container">
+    <!-- Logo e título -->
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
     <h1>Entrar</h1>
+    <!-- Formulário de login -->
     <form class="login-form" method="POST" action="/login">
       <label for="username">Usuário</label>
       <input type="text" id="username" name="username" required />
@@ -120,12 +131,14 @@
       <input type="password" id="password" name="password" required />
       <button type="submit">Entrar</button>
     </form>
+    <!-- Formulário de cadastro -->
     <form class="register-form" method="POST" action="/register">
       <label for="new-username">Criar novo usuário</label>
       <input type="text" id="new-username" name="username" required placeholder="Usuário" />
       <input type="password" id="new-password" name="password" required placeholder="Senha" />
       <button type="submit">Cadastrar</button>
     </form>
+    <!-- Informações sobre o usuário administrador -->
     <div class="adm-info">
       <p><strong>Usuário administrador:</strong> <span>adm</span></p>
       <p>Use o usuário <b>adm</b> para acessar funções administrativas.</p>

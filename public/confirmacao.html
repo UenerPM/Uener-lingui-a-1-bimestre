@@ -1,12 +1,21 @@
+<!--
+  Página de Confirmação do Pedido do sistema Uener Linguço
+  - Exibe resumo dos itens do carrinho
+  - Permite escolher a forma de pagamento
+  - Avança para a página de pagamento
+  - Redireciona para login se não autenticado
+-->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Confirmação do Pedido</title>
+  <!-- Importa o CSS principal -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
   <style>
+    /* Estilos específicos da página de confirmação */
     body {
       background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
       min-height: 100vh;
@@ -102,6 +111,7 @@
   </style>
 </head>
 <body>
+  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
     fetch('/api/session')
       .then(res => res.json())
@@ -112,27 +122,31 @@
       });
   </script>
   <header>
+    <!-- Botão de voltar e logo -->
     <button class="back-button" onclick="window.history.back()">← Voltar</button>
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
     <h1>Confirmação do Pedido</h1>
   </header>
 
   <main>
+    <!-- Resumo do pedido -->
     <section>
       <h2>Resumo do Pedido:</h2>
       <ul id="confirmacao-lista"></ul>
     </section>
 
+    <!-- Escolha da forma de pagamento -->
     <section>
       <h2>Forma de Pagamento:</h2>
       <label><input type="radio" name="pagamento" value="PIX" checked /> PIX</label>
       <label><input type="radio" name="pagamento" value="Cartão de Crédito" /> Cartão de Crédito</label>
     </section>
 
-    <!-- vai para pagamento -->
+    <!-- Botão para finalizar e ir para pagamento -->
     <button id="btn-finalizar" class="botao">Finalizar e Pagar</button>
   </main>
 
+  <!-- Script para preencher resumo e avançar para pagamento -->
   <script>
     // Preenche resumo e define onclick para avançar
     document.addEventListener("DOMContentLoaded", () => {
