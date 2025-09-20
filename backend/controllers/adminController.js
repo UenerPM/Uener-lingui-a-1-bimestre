@@ -46,15 +46,18 @@ exports.demote = async (req, res) => {
   res.json({ ok: true });
 };
 
-// Linguiças CRUD
-exports.listLinguicas = async (req, res) => res.json(await store.getAll('linguicas'));
+// Linguiças: alias to 'produtos' collection
+exports.listLinguicas = async (req, res) => {
+  const items = await store.getAll('produtos');
+  res.json(items);
+};
 exports.createLinguica = async (req, res) => {
   const { nome, preco } = req.body;
-  if (!nome) return res.status(400).json({ erro: 'Nome obrigatório.' });
-  const linguicas = await store.getAll('linguicas');
-  if (linguicas.find(l => l.nome === nome)) return res.status(409).json({ erro: 'Linguiça já existe.' });
+  if (!nome) return resp.badRequest(res, 'Nome obrigatório.');
+  const produtos = await store.getAll('produtos');
+  if (produtos.find(p => p.nome === nome)) return resp.conflict(res, 'Produto já existe.');
   const imagemFile = req.file;
-  const item = await store.insert('linguicas', { nome, preco, imagem: '' });
+  const item = await store.insert('produtos', { nome, preco, imagem: '' });
   if (imagemFile) {
     const ext = path.extname(imagemFile.originalname) || '.png';
     const novoNome = `${item.id}${ext}`;
@@ -62,7 +65,7 @@ exports.createLinguica = async (req, res) => {
     try {
       if (fs.existsSync(destino)) fs.unlinkSync(destino);
       fs.renameSync(imagemFile.path, destino);
-      await store.update('linguicas', item.id, { imagem: novoNome });
+      await store.update('produtos', item.id, { imagem: novoNome });
     } catch (e) { console.error(e); }
   }
   res.json(item);
@@ -70,8 +73,8 @@ exports.createLinguica = async (req, res) => {
 exports.updateLinguica = async (req, res) => {
   const { id } = req.params;
   const imagemFile = req.file;
-  const updated = await store.update('linguicas', id, req.body);
-  if (!updated) return res.status(404).json({ erro: 'Linguiça não encontrada.' });
+  const updated = await store.update('produtos', id, req.body);
+  if (!updated) return resp.notFound(res, 'Produto não encontrado.');
   if (imagemFile) {
     const ext = path.extname(imagemFile.originalname) || '.png';
     const novoNome = `${updated.id}${ext}`;
@@ -82,14 +85,14 @@ exports.updateLinguica = async (req, res) => {
       }
       if (fs.existsSync(destino)) fs.unlinkSync(destino);
       fs.renameSync(imagemFile.path, destino);
-      await store.update('linguicas', updated.id, { imagem: novoNome });
+      await store.update('produtos', updated.id, { imagem: novoNome });
     } catch (e) { console.error(e); }
   }
   res.json(updated);
 };
 exports.deleteLinguica = async (req, res) => {
   const { id } = req.params;
-  const ok = await store.remove('linguicas', id);
-  if (!ok) return res.status(404).json({ erro: 'Linguiça não encontrada.' });
+  const ok = await store.remove('produtos', id);
+  if (!ok) return resp.notFound(res, 'Produto não encontrado.');
   res.json({ ok: true });
 };

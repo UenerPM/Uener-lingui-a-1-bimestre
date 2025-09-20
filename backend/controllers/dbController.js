@@ -318,6 +318,13 @@ const createForma = async (req, res) => {
   res.json(rows[0]);
 };
 
+const deleteForma = async (req, res) => {
+  const id = req.params.id;
+  const r = await run('DELETE FROM forma_pagamento WHERE id_forma_pagamento=$1 RETURNING id_forma_pagamento', [id]);
+  if (!r[0]) return resp.notFound(res, 'Forma de pagamento não encontrada');
+  res.json({ ok: true });
+};
+
 // Relação pagamento_forma_pagamento
 const listPagamentoFormas = async (req, res) => {
   const rows = await run('SELECT id_pagamento, id_forma_pagamento, valor_pago FROM pagamento_forma_pagamento ORDER BY id_pagamento');
@@ -334,7 +341,7 @@ const controllers = {
   pedidos: { list: listPedidosSql, get: getPedidoSql, create: createPedidoSql, update: updatePedidoSql, remove: deletePedidoSql },
   produto_pedido: { list: listProdutoPedido, get: getProdutoPedido, create: createProdutoPedido, update: updateProdutoPedido, remove: deleteProdutoPedido },
   pagamentos: { list: listPagamentosSql, get: getPagamentoSql, create: createPagamentoSql, update: updatePagamentoSql, remove: deletePagamentoSql },
-  forma_pagamento: { list: listFormas, get: null, create: createForma, update: null, remove: null },
+  forma_pagamento: { list: listFormas, get: null, create: createForma, update: null, remove: deleteForma },
   pagamento_forma_pagamento: { list: listPagamentoFormas, get: null, create: null, update: null, remove: null }
 };
 
