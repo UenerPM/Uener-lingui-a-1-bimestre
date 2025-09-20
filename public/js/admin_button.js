@@ -1,5 +1,5 @@
 // Faz uma requisição para a API de sessão para saber se o usuário está logado e se é admin
-fetch('/api/session')
+fetch('/api/session', { credentials: 'same-origin' })
   .then(res => res.json()) // Converte a resposta para JSON
   .then(data => {
     // Se o usuário for administrador, exibe o botão de admin
@@ -8,7 +8,7 @@ fetch('/api/session')
       const header = document.querySelector('header');
       // Cria um novo elemento <a> que será o botão para o painel admin
       const btn = document.createElement('a');
-      btn.href = '/admin.html'; // Define o link do botão
+  btn.href = '/admin'; // Define o link do botão (rota protegida)
       btn.textContent = 'Painel Admin'; // Texto do botão
       btn.className = 'botao-admin'; // Classe para estilização
       btn.style.marginLeft = '20px'; // Espaçamento à esquerda

@@ -17,7 +17,7 @@
 <body class="admin-page">
   <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
-    fetch('/api/session')
+    fetch('/api/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (!data.username && !window.location.pathname.endsWith('login.html')) {
@@ -58,9 +58,30 @@
   </main>
   <!-- Script principal do painel admin -->
   <script src="js/admin.js"></script>
+  <script src="js/admin_funcionarios.js"></script>
+  <script src="js/admin_produtos.js"></script>
+  <script src="js/admin_pedidos_pagamentos.js"></script>
+  <script src="js/admin_cargos.js"></script>
+  <script src="js/admin_clientes.js"></script>
+  <script src="js/admin_formas_pagamento.js"></script>
+  <script>
+    // Delegação simples para botões dinâmicos de editar/excluir
+    document.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('[data-action="edit"]');
+      const delBtn = e.target.closest('[data-action="delete"]');
+      if (editBtn) {
+        const { type, id } = editBtn.dataset;
+        document.dispatchEvent(new CustomEvent('admin:edit', { detail: { type, id } }));
+      }
+      if (delBtn) {
+        const { type, id } = delBtn.dataset;
+        document.dispatchEvent(new CustomEvent('admin:delete', { detail: { type, id } }));
+      }
+    });
+  </script>
   <!-- Exibe usuário logado no topo -->
   <script>
-    fetch('/api/session')
+    fetch('/api/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (data.username) {

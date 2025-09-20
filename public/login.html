@@ -111,7 +111,7 @@
   <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
     // Redireciona imediatamente para login se não estiver logado (exceto na própria login.html)
-    fetch('/api/session')
+    fetch('/api/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (!data.username && !window.location.pathname.endsWith('login.html')) {
@@ -124,7 +124,7 @@
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
     <h1>Entrar</h1>
     <!-- Formulário de login -->
-    <form class="login-form" method="POST" action="/login">
+    <form id="loginForm" class="login-form">
       <label for="username">Usuário</label>
       <input type="text" id="username" name="username" required />
       <label for="password">Senha</label>
@@ -132,7 +132,7 @@
       <button type="submit">Entrar</button>
     </form>
     <!-- Formulário de cadastro -->
-    <form class="register-form" method="POST" action="/register">
+    <form id="registerForm" class="register-form">
       <label for="new-username">Criar novo usuário</label>
       <input type="text" id="new-username" name="username" required placeholder="Usuário" />
       <input type="password" id="new-password" name="password" required placeholder="Senha" />
@@ -143,7 +143,51 @@
       <p><strong>Usuário administrador:</strong> <span>adm</span></p>
       <p>Use o usuário <b>adm</b> para acessar funções administrativas.</p>
     </div>
-    <a href="/logout" class="logout-btn">Logout</a>
+    <a id="logoutLink" href="/auth/logout" class="logout-btn">Logout</a>
   </div>
+  <script>
+    // Se já estiver logado, redireciona para a página principal
+    fetch('/auth/session', { credentials: 'same-origin' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.username) {
+          window.location.replace('/index.html');
+        }
+      });
+
+    // Login via fetch JSON
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ username, password })
+        });
+        const body = await res.json();
+        if (res.ok) return window.location.replace('/index.html');
+        alert(body.erro || 'Erro ao efetuar login');
+      } catch (err) { alert('Erro de rede'); }
+    });
+
+    // Registro via fetch JSON
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('new-username').value.trim();
+      const password = document.getElementById('new-password').value.trim();
+      try {
+        const res = await fetch('/auth/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ username, password })
+        });
+        const body = await res.json();
+        if (res.ok) { alert('Cadastro realizado'); return window.location.replace('/index.html'); }
+        alert(body.erro || 'Erro ao cadastrar');
+      } catch (err) { alert('Erro de rede'); }
+    });
+  </script>
 </body>
 </html>

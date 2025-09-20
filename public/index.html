@@ -177,7 +177,7 @@
 <body>
   <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
-    fetch('/api/session')
+    fetch('/auth/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (!data.username && !window.location.pathname.endsWith('login.html')) {
@@ -208,7 +208,7 @@
   <script src="js/admin_button.js"></script>
   <!-- Exibe usuário logado e botão de logout -->
   <script>
-    fetch('/api/session')
+    fetch('/auth/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (data.username) {
@@ -218,7 +218,7 @@
           userSpan.style = 'position:absolute;top:24px;left:32px;font-weight:bold;color:#fff;background:#bb3e03;padding:4px 12px;border-radius:8px;';
           header.appendChild(userSpan);
           const btn = document.createElement('a');
-          btn.href = '/logout';
+          btn.href = '/auth/logout';
           btn.textContent = 'Sair';
           btn.className = 'logout-btn';
           header.appendChild(btn);

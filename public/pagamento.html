@@ -106,7 +106,7 @@
 <body>
   <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
   <script>
-    fetch('/api/session')
+    fetch('/api/session', { credentials: 'same-origin' })
       .then(res => res.json())
       .then(data => {
         if (!data.username && !window.location.pathname.endsWith('login.html')) {

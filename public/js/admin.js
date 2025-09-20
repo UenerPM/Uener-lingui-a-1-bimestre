@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.confirm('Deseja realmente adicionar este usuário?')) return;
     await fetch('/admin/usuarios', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('imagem', imagem);
     await fetch('/admin/linguicas', {
       method: 'POST',
+      credentials: 'same-origin',
       body: formData
     });
     form.reset();
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function carregarUsuarios() {
-  const res = await fetch('/admin/usuarios');
+  const res = await fetch('/admin/usuarios', { credentials: 'same-origin' });
   const usuarios = await res.json();
   const lista = document.getElementById('usuarios-lista');
   lista.innerHTML = usuarios.map(u =>
@@ -55,12 +57,12 @@ async function carregarUsuarios() {
 
 async function removerUsuario(username) {
   if (!window.confirm('Deseja realmente remover este usuário?')) return;
-  await fetch(`/admin/usuarios/${username}`, { method: 'DELETE' });
+  await fetch(`/admin/usuarios/${username}`, { method: 'DELETE', credentials: 'same-origin' });
   carregarUsuarios();
 }
 
 async function carregarLinguicas() {
-  const res = await fetch('/admin/linguicas');
+  const res = await fetch('/admin/linguicas', { credentials: 'same-origin' });
   const linguicas = await res.json();
   const lista = document.getElementById('linguicas-lista');
   lista.innerHTML = linguicas.map(l =>
@@ -73,7 +75,7 @@ async function carregarLinguicas() {
 }
 
 window.editarLinguica = function(nome) {
-  fetch('/admin/linguicas')
+  fetch('/admin/linguicas', { credentials: 'same-origin' })
     .then(res => res.json())
     .then(linguicas => {
       const l = linguicas.find(l => l.nome === nome);
@@ -97,6 +99,7 @@ window.editarLinguica = function(nome) {
         const formData = new FormData(form);
         await fetch(`/admin/linguicas/${encodeURIComponent(nome)}`, {
           method: 'PUT',
+          credentials: 'same-origin',
           body: formData
         });
         modal.style.display = 'none';
@@ -107,24 +110,24 @@ window.editarLinguica = function(nome) {
 
 async function removerLinguica(nome) {
   if (!window.confirm('Deseja realmente remover esta linguiça?')) return;
-  await fetch(`/admin/linguicas/${encodeURIComponent(nome)}`, { method: 'DELETE' });
+  await fetch(`/admin/linguicas/${encodeURIComponent(nome)}`, { method: 'DELETE', credentials: 'same-origin' });
   carregarLinguicas();
 }
 
 window.toggleBloqueioUsuario = async function(username) {
   if (!window.confirm('Deseja realmente bloquear/desbloquear este usuário?')) return;
-  await fetch(`/admin/usuarios/${username}/bloquear`, { method: 'PATCH' });
+  await fetch(`/admin/usuarios/${username}/bloquear`, { method: 'PATCH', credentials: 'same-origin' });
   carregarUsuarios();
 };
 
 window.promoverUsuario = async function(username) {
   if (!window.confirm('Deseja realmente promover este usuário a admin?')) return;
-  await fetch(`/admin/usuarios/${username}/promover`, { method: 'PATCH' });
+  await fetch(`/admin/usuarios/${username}/promover`, { method: 'PATCH', credentials: 'same-origin' });
   carregarUsuarios();
 };
 
 window.despromoverUsuario = async function(username) {
   if (!window.confirm('Deseja realmente despromover este admin?')) return;
-  await fetch(`/admin/usuarios/${username}/despromover`, { method: 'PATCH' });
+  await fetch(`/admin/usuarios/${username}/despromover`, { method: 'PATCH', credentials: 'same-origin' });
   carregarUsuarios();
 };

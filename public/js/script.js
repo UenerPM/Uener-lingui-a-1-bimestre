@@ -304,7 +304,7 @@ function setupPagamentoPage() {
 
 // Carrega os produtos disponíveis da API e renderiza na página
 async function carregarProdutos() {
-  const res = await fetch('/api/linguicas');
+  const res = await fetch('/api/linguicas', { credentials: 'same-origin' });
   const linguicas = await res.json();
   const container = document.getElementById('produtos-lista');
   container.innerHTML = linguicas.map(l => `
