@@ -1,0 +1,105 @@
+body {
+  background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #232526;
+}
+.header {
+  background: #bb3e03;
+  color: #fff;
+  padding: 24px 0 12px 0;
+  text-align: center;
+  border-bottom: 4px solid #fff;
+  margin-bottom: 24px;
+}
+.header-title {
+  font-size: 2.2rem;
+  margin: 0;
+  letter-spacing: 2px;
+  color: #fff;
+  cursor: pointer;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px #bb3e0330;
+}
+.confirmacao h2 {
+  color: #bb3e03;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.confirmacao-lista {
+  background: #f5e7d3;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  list-style: none;
+  padding-left: 0;
+}
+.confirmacao-lista li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+  color: #232526;
+}
+.confirmacao-lista li:last-child {
+  border-bottom: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #bb3e03;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #bb3e03;
+}
+.botoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.btn-confirmar {
+  background: #bb3e03;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  flex: 1;
+  min-width: 150px;
+}
+.btn-confirmar:hover:not(:disabled) {
+  background: #fff;
+  color: #bb3e03;
+  border: 2px solid #bb3e03;
+}
+.btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-voltar {
+  background: transparent;
+  color: #bb3e03;
+  border: 2px solid #bb3e03;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  flex: 1;
+  min-width: 150px;
+}
+.btn-voltar:hover { background: #bb3e03; color: #fff; }
+.status-msg { text-align: center; margin-top: 20px; padding: 16px; border-radius: 8px; display: none; }
+.status-msg.erro { background: #ffebee; color: #c62828; display: block; }
+.status-msg.sucesso { background: #e8f5e9; color: #2e7d32; display: block; }
+.spinner { display: none; border: 4px solid #f3f3f3; border-top: 4px solid #bb3e03; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 8px; vertical-align: middle; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.logo-header { height: 40px; margin-bottom: 8px; }
+#sucesso-msg { display: none; text-align: center; margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 8px; border: 2px solid #2e7d32; }
+#sucesso-msg p { color: #2e7d32; font-weight: bold; font-size: 1.1rem; margin: 0; }
