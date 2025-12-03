@@ -1,17 +1,44 @@
+/* public/js/script.js
+   Utilitários públicos para sessão e chamadas simples
+*/
+
+if (typeof verificarSessao === 'undefined') {
+  async function verificarSessao(){
+    try{
+      const r = await fetch('/api/me', { credentials: 'include' });
+      if(!r.ok) return null; const j = await r.json(); return (j && j.success) ? (j.user || j.data || j) : null;
+    }catch(err){ console.error('verificarSessao',err); return null; }
+  }
+  window.verificarSessao = verificarSessao;
+}
 // Recupera o carrinho do localStorage ou retorna um objeto vazio
-function getCarrinho() {
-  return JSON.parse(localStorage.getItem("carrinho")) || {};
+if (typeof getCarrinho === 'undefined') {
+  function getCarrinho() {
+    try {
+      return JSON.parse(localStorage.getItem("carrinho")) || {};
+    } catch (err) {
+      console.warn('getCarrinho parse error, returning empty', err);
+      return {};
+    }
+  }
+  window.getCarrinho = getCarrinho;
 }
 
 // Salva o carrinho no localStorage
-function salvarCarrinho(carrinho) {
-  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+if (typeof salvarCarrinho === 'undefined') {
+  function salvarCarrinho(carrinho) {
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  }
+  window.salvarCarrinho = salvarCarrinho;
 }
 
 // Limpa o carrinho e a forma de pagamento do localStorage
-function limparCarrinho() {
-  localStorage.removeItem("carrinho");
-  localStorage.removeItem("formaPagamento");
+if (typeof limparCarrinho === 'undefined') {
+  function limparCarrinho() {
+    localStorage.removeItem("carrinho");
+    localStorage.removeItem("formaPagamento");
+  }
+  window.limparCarrinho = limparCarrinho;
 }
 
 // Atualiza visualmente a lista de itens e o total no carrinho
@@ -178,6 +205,11 @@ function crc16(payload) {
   return crc.toString(16).toUpperCase().padStart(4, '0');
 }
 
+// ===== UTILITÁRIO: REMOVER DIACRÍTICOS =====
+function removerDiacriticos(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 // Monta o payload PIX seguindo o padrão EMV com CRC16
 function montarPayloadPix(chave, valor, nome, cidade) {
   const format = (id, value) => {
@@ -185,8 +217,12 @@ function montarPayloadPix(chave, valor, nome, cidade) {
     return `${id}${len}${value}`;
   };
 
-  const gui = format('00', 'br.gov.bcb.pix') + format('01', chave);
+  const gui = format('00', 'BR.GOV.BCB.PIX') + format('01', chave); // ✅ MAIÚSCULO
   const merchantInfo = format('26', gui);
+
+  // ✅ Sanitizar nome e cidade (remove diacríticos)
+  const nomeClean = removerDiacriticos(nome).slice(0, 25);
+  const cidadeClean = removerDiacriticos(cidade).slice(0, 15);
 
   const payload = [
     format('00', '01'),
@@ -195,8 +231,8 @@ function montarPayloadPix(chave, valor, nome, cidade) {
     format('53', '986'),
     format('54', valor.toFixed(2)),
     format('58', 'BR'),
-    format('59', nome.slice(0, 25)),
-    format('60', cidade.slice(0, 15)),
+    format('59', nomeClean),
+    format('60', cidadeClean),
     format('62', format('05', '***'))
   ].join('');
 
@@ -303,25 +339,170 @@ function setupPagamentoPage() {
 }
 
 // Carrega os produtos disponíveis da API e renderiza na página
-async function carregarProdutos() {
-  const res = await fetch('/api/linguicas');
-  const linguicas = await res.json();
-  const container = document.getElementById('produtos-lista');
-  container.innerHTML = linguicas.map(l => `
-    <div class="produto">
-      <img src="img/${l.imagem}" alt="Linguiça ${l.nome}" />
-      <h3>Linguiça ${l.nome}</h3>
-      <p>R$ ${Number(l.preco).toFixed(2).replace('.', ',')}</p>
-      <div class="controle-qtd">
-        <button class="remover btn-carrinho" data-nome="Linguiça ${l.nome}" aria-label="Remover uma unidade">−</button>
-        <span class="quantidade quantidade-carrinho" data-nome="Linguiça ${l.nome}">0</span>
-        <button class="adicionar btn-carrinho" data-nome="Linguiça ${l.nome}" data-preco="${l.preco}" aria-label="Adicionar uma unidade">+</button>
-      </div>
-    </div>
-  `).join('');
+// função defensiva para páginas legadas que ainda incluem este script
+if (typeof carregarProdutos === 'undefined') {
+  async function carregarProdutos() {
+    try {
+      const res = await fetch('/api/linguicas');
+      if (!res.ok) {
+        const txt = await res.text();
+        console.warn('[carregarProdutos] ✗ /api/linguicas returned', res.status, txt);
+        return [];
+      }
+      const body = await res.json();
+      
+      // Suporta várias formas de resposta: array direto, { success, data }, { data }
+      let arr = [];
+      if (Array.isArray(body)) arr = body;
+      else if (body && Array.isArray(body.data)) arr = body.data;
+      else if (body && body.success && Array.isArray(body.data)) arr = body.data;
+      else if (body && body.linguicas && Array.isArray(body.linguicas)) arr = body.linguicas;
+      else {
+        // Se veio um objeto que contém os itens em alguma propriedade, tentar descobrir
+        const possible = Object.values(body).find(v => Array.isArray(v));
+        if (Array.isArray(possible)) arr = possible;
+      }
+
+      console.log('[carregarProdutos] ✓ Carregados', arr.length, 'produtos');
+
+      const container = document.getElementById('produtos-lista');
+      if (!container) return arr;
+
+      container.innerHTML = arr.map(l => {
+        // Usar imagem via /api/imagem/:id
+        // O backend retorna imagem como "/api/imagem/1"
+        let imagemSrc = '';
+        
+        if (l.imagem && l.imagem.startsWith('/api/imagem/')) {
+          // Já é URL da API, usar direto
+          imagemSrc = l.imagem; // Ex: /api/imagem/1
+        } else if (l.id) {
+          // Se não tiver imagem da API, construir da URL
+          imagemSrc = `/api/imagem/${l.id}`;
+        } else if (l.idproduto) {
+          // Fallback para idproduto
+          imagemSrc = `/api/imagem/${l.idproduto}`;
+        } else {
+          // Sem ID, usar fallback
+          imagemSrc = '/api/imagem/no-image.png';
+        }
+
+        return `
+        <div class="produto">
+          <img src="${imagemSrc}" 
+               alt="${l.nome || l.nomeproduto || ''}" 
+               class="produto-imagem" />
+          <h3>${l.nome || l.nomeproduto || ''}</h3>
+          <p>R$ ${Number(l.preco || l.precounitario || l.preco_unit || 0).toFixed(2).replace('.', ',')}</p>
+          <div class="controle-qtd">
+            <button class="remover btn-carrinho" data-nome="${l.nome || l.nomeproduto || ''}" aria-label="Remover uma unidade">−</button>
+            <span class="quantidade quantidade-carrinho" data-nome="${l.nome || l.nomeproduto || ''}">0</span>
+            <button class="adicionar btn-carrinho" data-nome="${l.nome || l.nomeproduto || ''}" data-preco="${l.preco || l.precounitario || 0}" aria-label="Adicionar uma unidade">+</button>
+          </div>
+        </div>
+        `;
+      }).join('');
+
+      return arr;
+    } catch (err) {
+      console.error('[carregarProdutos] ✗ erro', err);
+      return [];
+    }
+  }
+  window.carregarProdutos = carregarProdutos;
 }
 
-// Inicializa os comportamentos conforme a página atual
+/**
+ * Construir URL de imagem com fallback automático
+ * Estratégia:
+ * 1. Se for caminho completo (/img/..., /imgs/, http), usar direto
+ * 2. Se for nome só (ex: 35929.jpeg), servir via /imagens-produtos/
+ * 3. Fallback: /img/no-image.png
+ */
+if (typeof construirUrlImagem === 'undefined') {
+  function construirUrlImagem(imagemCampo) {
+    // Se não tem caminho, usar default
+    if (!imagemCampo) {
+      return '/img/no-image.png';
+    }
+    
+    // Se é uma URL completa (começa com http), usar direto
+    if (imagemCampo.startsWith('http')) {
+      return imagemCampo;
+    }
+    
+    // Se já é um caminho relativo ao public/ (/img/, /imgs/, /uploads/), usar direto
+    if (imagemCampo.startsWith('/')) {
+      return imagemCampo;
+    }
+    
+    // Senão, é um nome de arquivo do banco, servir via rota /imagens-produtos
+    return `/imagens-produtos/${encodeURIComponent(imagemCampo)}`;
+  }
+  window.construirUrlImagem = construirUrlImagem;
+}
+
+/**
+ * Carrega os produtos disponíveis da API e renderiza na página
+ * função defensiva para páginas legadas que ainda incluem este script
+ */
+if (typeof carregarProdutos === 'undefined') {
+  async function carregarProdutos() {
+    try {
+      const res = await fetch('/api/linguicas');
+      if (!res.ok) {
+        const txt = await res.text();
+        console.warn('[carregarProdutos] ✗ /api/linguicas returned', res.status, txt);
+        return [];
+      }
+      const body = await res.json();
+      
+      // Suporta várias formas de resposta: array direto, { success, data }, { data }
+      let arr = [];
+      if (Array.isArray(body)) arr = body;
+      else if (body && Array.isArray(body.data)) arr = body.data;
+      else if (body && body.success && Array.isArray(body.data)) arr = body.data;
+      else if (body && body.linguicas && Array.isArray(body.linguicas)) arr = body.linguicas;
+      else {
+        // Se veio um objeto que contém os itens em alguma propriedade, tentar descobrir
+        const possible = Object.values(body).find(v => Array.isArray(v));
+        if (Array.isArray(possible)) arr = possible;
+      }
+
+      console.log('[carregarProdutos] ✓ Carregados', arr.length, 'produtos');
+
+      const container = document.getElementById('produtos-lista');
+      if (!container) return arr;
+
+      container.innerHTML = arr.map(l => {
+        // Construir URL da imagem usando a função helper
+        const imagemSrc = construirUrlImagem(l.imagem || l.caminho || '');
+
+        return `
+        <div class="produto">
+          <img src="${imagemSrc}" 
+               alt="${l.nome || l.nomeproduto || ''}" 
+               onerror="this.onerror=null;this.src='/img/no-image.png'" 
+               class="produto-imagem" />
+          <h3>${l.nome || l.nomeproduto || ''}</h3>
+          <p>R$ ${Number(l.preco || l.precounitario || l.preco_unit || 0).toFixed(2).replace('.', ',')}</p>
+          <div class="controle-qtd">
+            <button class="remover btn-carrinho" data-nome="${l.nome || l.nomeproduto || ''}" aria-label="Remover uma unidade">−</button>
+            <span class="quantidade quantidade-carrinho" data-nome="${l.nome || l.nomeproduto || ''}">0</span>
+            <button class="adicionar btn-carrinho" data-nome="${l.nome || l.nomeproduto || ''}" data-preco="${l.preco || l.precounitario || 0}" aria-label="Adicionar uma unidade">+</button>
+          </div>
+        </div>
+        `;
+      }).join('');
+
+      return arr;
+    } catch (err) {
+      console.error('[carregarProdutos] ✗ erro', err);
+      return [];
+    }
+  }
+  window.carregarProdutos = carregarProdutos;
+}
 document.addEventListener("DOMContentLoaded", () => {
   setupIndexPage();
   setupConfirmacaoPage();

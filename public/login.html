@@ -1,32 +1,26 @@
-<!--
-  Página de Login do sistema Uener Linguço
-  - Permite login e cadastro de novos usuários
-  - Exibe informações sobre o usuário administrador
-  - Redireciona para login se não autenticado
--->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Uener Linguço</title>
-  <!-- Importa o CSS principal -->
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
   <style>
-    /* Estilos específicos da página de login */
     body.login-page {
       background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
     .login-container {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 4px 24px #bb3e0320;
-      padding: 40px 32px 32px 32px;
+      box-shadow: 0 4px 24px rgba(187, 62, 3, 0.2);
+      padding: 40px 32px;
       width: 100%;
       max-width: 370px;
       display: flex;
@@ -42,15 +36,25 @@
       margin-bottom: 18px;
       color: #bb3e03;
       letter-spacing: 1px;
+      margin: 0 0 18px 0;
     }
-    .login-form, .register-form {
+    .form-section {
       width: 100%;
+      margin-bottom: 20px;
+    }
+    .form-section h2 {
+      font-size: 1.1rem;
+      color: #bb3e03;
+      margin-bottom: 10px;
+      text-align: center;
+      margin: 0 0 10px 0;
+    }
+    .form-section form {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 18px;
     }
-    .login-form input, .register-form input {
+    .form-section input {
       border-radius: 6px;
       border: 1.5px solid #bb3e03;
       padding: 10px;
@@ -60,12 +64,11 @@
       outline: none;
       transition: border 0.2s;
     }
-    .login-form input:focus, .register-form input:focus {
+    .form-section input:focus {
       border: 2px solid #bb3e03;
       background: #fff;
-      color: #bb3e03;
     }
-    .login-form button, .register-form button {
+    .form-section button {
       background: #bb3e03;
       color: #fff;
       border: none;
@@ -77,73 +80,134 @@
       margin-top: 6px;
       transition: background 0.2s, color 0.2s;
     }
-    .login-form button:hover, .register-form button:hover {
+    .form-section button:hover {
       background: #fff;
       color: #bb3e03;
       border: 1px solid #bb3e03;
     }
-    .adm-info {
-      margin-top: 10px;
+    .message {
+      width: 100%;
+      margin-bottom: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
       font-size: 0.95rem;
+      display: none;
+    }
+    .message.error {
+      background: #ffcdd2;
+      color: #c62828;
+      border: 1px solid #ef5350;
+      display: block;
+    }
+    .message.success {
+      background: #c8e6c9;
+      color: #2e7d32;
+      border: 1px solid #66bb6a;
+      display: block;
+    }
+    .adm-info {
+      margin-top: 16px;
+      font-size: 0.9rem;
       color: #bb3e03;
       text-align: center;
+      border-top: 1px solid #ddd;
+      padding-top: 16px;
     }
-    .adm-info span {
+    .adm-info p {
+      margin: 4px 0;
+    }
+    .adm-info strong {
       color: #bb3e03;
-      font-weight: bold;
     }
-    .logout-btn {
-      position: absolute;
-      top: 24px;
-      right: 32px;
-      color: #bb3e03;
-      font-weight: bold;
-      text-decoration: none;
-      font-size: 1rem;
-      transition: color 0.2s;
-    }
-    .logout-btn:hover {
-      color: #d32f2f;
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: #ddd;
+      margin: 16px 0;
     }
   </style>
 </head>
 <body class="login-page">
-  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
-  <script>
-    // Redireciona imediatamente para login se não estiver logado (exceto na própria login.html)
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.username && !window.location.pathname.endsWith('login.html')) {
-          window.location.replace('/login.html');
-        }
-      });
-  </script>
   <div class="login-container">
     <!-- Logo e título -->
     <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
-    <h1>Entrar</h1>
-    <!-- Formulário de login -->
-    <form class="login-form" method="POST" action="/login">
-      <label for="username">Usuário</label>
-      <input type="text" id="username" name="username" required />
-      <label for="password">Senha</label>
-      <input type="password" id="password" name="password" required />
-      <button type="submit">Entrar</button>
-    </form>
-    <!-- Formulário de cadastro -->
-    <form class="register-form" method="POST" action="/register">
-      <label for="new-username">Criar novo usuário</label>
-      <input type="text" id="new-username" name="username" required placeholder="Usuário" />
-      <input type="password" id="new-password" name="password" required placeholder="Senha" />
-      <button type="submit">Cadastrar</button>
-    </form>
-    <!-- Informações sobre o usuário administrador -->
-    <div class="adm-info">
-      <p><strong>Usuário administrador:</strong> <span>adm</span></p>
-      <p>Use o usuário <b>adm</b> para acessar funções administrativas.</p>
+    <h1>Uener Linguço</h1>
+
+    <!-- Mensagens de erro/sucesso -->
+    <div id="message" class="message"></div>
+
+    <!-- Seção de Login -->
+    <div class="form-section">
+      <h2>Fazer Login</h2>
+      <form id="form-login">
+        <input
+          type="email"
+          id="login-email"
+          placeholder="Email"
+          required
+          autocomplete="email"
+        />
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Senha"
+          required
+          autocomplete="current-password"
+        />
+        <button type="submit">Entrar</button>
+      </form>
     </div>
-    <a href="/logout" class="logout-btn">Logout</a>
+
+    <div class="divider"></div>
+
+    <!-- Informações sobre admin -->
+    <div class="adm-info">
+      <p><strong>Sistema de Teste:</strong> Avap2 PostgreSQL</p>
+      <p style="font-size: 0.85rem; color: #999; margin-top: 8px;">
+        Use suas credenciais cadastradas no banco
+      </p>
+    </div>
   </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
+  <script>
+    const messageEl = document.getElementById('message');
+    const formLogin = document.getElementById('form-login');
+
+    function showMessage(text, type = 'error') {
+      messageEl.textContent = text;
+      messageEl.className = 'message ' + type;
+      setTimeout(() => { messageEl.className = 'message'; }, 5000);
+    }
+
+    // Verifica sessão e redireciona se já estiver logado
+    (async () => {
+      const user = await verificarSessao();
+      if (user) {
+        window.location.replace('/index.html');
+      }
+    })();
+
+    // Submissão do formulário de login
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const senha = document.getElementById('login-password').value;
+
+      if (!email || !senha) {
+        return showMessage('Email e senha são obrigatórios', 'error');
+      }
+
+      const result = await fazerLogin(email, senha);
+      if (result.success) {
+        showMessage('Login realizado com sucesso!', 'success');
+        setTimeout(() => { window.location.href = '/index.html'; }, 800);
+      } else {
+        showMessage(result.message || 'Falha ao fazer login', 'error');
+      }
+    });
+  </script>
 </body>
 </html>

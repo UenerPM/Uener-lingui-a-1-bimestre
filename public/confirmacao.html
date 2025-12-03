@@ -1,21 +1,12 @@
-<!--
-  Página de Confirmação do Pedido do sistema Uener Linguço
-  - Exibe resumo dos itens do carrinho
-  - Permite escolher a forma de pagamento
-  - Avança para a página de pagamento
-  - Redireciona para login se não autenticado
--->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Confirmação do Pedido</title>
-  <!-- Importa o CSS principal -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uener Linguço — Confirmação do Pedido</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
   <style>
-    /* Estilos específicos da página de confirmação */
     body {
       background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
       min-height: 100vh;
@@ -23,160 +14,316 @@
       font-family: 'Segoe UI', Arial, sans-serif;
       color: #232526;
     }
-    header {
+    .header {
       background: #bb3e03;
       color: #fff;
       padding: 24px 0 12px 0;
       text-align: center;
       border-bottom: 4px solid #fff;
       margin-bottom: 24px;
-      position: relative;
     }
-    .back-button {
-      position: absolute;
-      left: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #fff;
-      color: #bb3e03;
-      border: 2px solid #bb3e03;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      padding: 6px 16px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-    .back-button:hover {
-      background: #bb3e03;
-      color: #fff;
-    }
-    .logo {
-      height: 60px;
-      margin-bottom: 8px;
-    }
-    h1 {
+    .header-title {
       font-size: 2.2rem;
       margin: 0;
       letter-spacing: 2px;
       color: #fff;
+      cursor: pointer;
     }
-    main {
-      max-width: 500px;
+    .container {
+      max-width: 600px;
       margin: 0 auto;
       padding: 32px 16px;
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 2px 16px #bb3e0330;
     }
-    h2 {
+    .confirmacao h2 {
       color: #bb3e03;
-      margin-bottom: 16px;
-    }
-    #confirmacao-lista {
-      background: #fff7e6;
-      padding: 20px;
-      border-radius: 10px;
+      text-align: center;
       margin-bottom: 24px;
-      border: 1px solid #bb3e03;
     }
-    .botao, #btn-finalizar {
-      width: 100%;
+    .confirmacao-lista {
+      background: #f5e7d3;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      list-style: none;
+      padding-left: 0;
+    }
+    .confirmacao-lista li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      color: #232526;
+    }
+    .confirmacao-lista li:last-child {
+      border-bottom: none;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #bb3e03;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 2px solid #bb3e03;
+    }
+    .botoes {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .btn-confirmar {
       background: #bb3e03;
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 14px;
-      font-size: 1.1rem;
+      padding: 12px 24px;
+      font-size: 1rem;
       font-weight: bold;
-      margin-top: 18px;
-      transition: background 0.2s, color 0.2s;
-      box-shadow: 0 2px 8px #bb3e0330;
       cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      flex: 1;
+      min-width: 150px;
     }
-    .botao:hover, #btn-finalizar:hover {
+    .btn-confirmar:hover:not(:disabled) {
       background: #fff;
       color: #bb3e03;
       border: 2px solid #bb3e03;
     }
-    label {
-      font-size: 1.1rem;
-      color: #bb3e03;
-      margin-right: 16px;
-      cursor: pointer;
+    .btn-confirmar:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
-    input[type="radio"] {
-      accent-color: #bb3e03;
-      margin-right: 8px;
+    .btn-voltar {
+      background: transparent;
+      color: #bb3e03;
+      border: 2px solid #bb3e03;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      flex: 1;
+      min-width: 150px;
+    }
+    .btn-voltar:hover {
+      background: #bb3e03;
+      color: #fff;
+    }
+    .status-msg {
+      text-align: center;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    .status-msg.erro {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
+    }
+    .status-msg.sucesso {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    .spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #bb3e03;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .logo-header {
+      height: 40px;
+      margin-bottom: 8px;
+    }
+    #sucesso-msg {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      padding: 20px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      border: 2px solid #2e7d32;
+    }
+    #sucesso-msg p {
+      color: #2e7d32;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
-  <script>
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.username && !window.location.pathname.endsWith('login.html')) {
-          window.location.replace('/login.html');
-        }
-      });
-  </script>
-  <header>
-    <!-- Botão de voltar e logo -->
-    <button class="back-button" onclick="window.history.back()">← Voltar</button>
-    <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
-    <h1>Confirmação do Pedido</h1>
+  <header class="header">
+    <img src="img/logo.png" alt="Logo" class="logo-header">
+    <h1 class="header-title" onclick="window.location.href='index.html'">Uener Linguço</h1>
   </header>
 
-  <main>
-    <!-- Resumo do pedido -->
-    <section>
-      <h2>Resumo do Pedido:</h2>
-      <ul id="confirmacao-lista"></ul>
-    </section>
+  <main class="container">
+    <section class="confirmacao">
+      <h2>Confirmação do Pedido</h2>
 
-    <!-- Escolha da forma de pagamento -->
-    <section>
-      <h2>Forma de Pagamento:</h2>
-      <label><input type="radio" name="pagamento" value="PIX" checked /> PIX</label>
-      <label><input type="radio" name="pagamento" value="Cartão de Crédito" /> Cartão de Crédito</label>
-    </section>
+      <!-- Lista de itens do carrinho -->
+      <ul id="confirmacao-lista" class="confirmacao-lista">
+        <li>Carregando carrinho...</li>
+      </ul>
 
-    <!-- Botão para finalizar e ir para pagamento -->
-    <button id="btn-finalizar" class="botao">Finalizar e Pagar</button>
+      <!-- Botões de ação -->
+      <div class="botoes">
+        <button id="btn-voltar-carrinho" class="btn-voltar">← Voltar</button>
+        <button id="btn-confirmar-pedido" class="btn-confirmar">Confirmar Pedido</button>
+      </div>
+
+      <!-- Mensagem de status -->
+      <div id="status-msg" class="status-msg">
+        <span id="status-texto"></span>
+        <span class="spinner" id="spinner"></span>
+      </div>
+
+      <!-- Sucesso: opção de ir para pagamento -->
+      <div id="sucesso-msg">
+        <p>✓ Pedido criado com sucesso!</p>
+        <button id="btn-ir-pagamento" class="btn-confirmar" style="margin-top: 12px;">
+          Ir para Pagamento
+        </button>
+      </div>
+    </section>
   </main>
 
-  <!-- Script para preencher resumo e avançar para pagamento -->
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
   <script>
-    // Preenche resumo e define onclick para avançar
-    document.addEventListener("DOMContentLoaded", () => {
-      const lista = document.getElementById("confirmacao-lista");
-      const carrinho = JSON.parse(localStorage.getItem("carrinho")) || {};
-      let total = 0;
-      lista.innerHTML = "";
+    let idPedidoAtual = null;
 
-      if (Object.keys(carrinho).length === 0) {
-        lista.innerHTML = "<li>Nenhum item no carrinho</li>";
-      } else {
-        Object.entries(carrinho).forEach(([nome, item]) => {
-          const subtotal = item.preco * item.quantidade;
-          lista.innerHTML += `<li>${nome} x${item.quantidade} – R$ ${subtotal.toFixed(2)}</li>`;
-          total += subtotal;
-        });
-        lista.innerHTML += `<li><strong>Total: R$ ${total.toFixed(2)}</strong></li>`;
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Validar sessão
+      const user = await verificarSessao();
+      if (!user) {
+        window.location.replace('/login.html');
+        return;
       }
 
-      document.getElementById("btn-finalizar").addEventListener("click", () => {
-        // impede se carrinho vazio
-        if (Object.keys(carrinho).length === 0) {
-          return alert("Carrinho vazio!");
+      // 2. Carregar e exibir carrinho
+      const carrinho = getCarrinho();
+      exibirCarrinho(carrinho);
+
+      // 3. Botão voltar
+      document.getElementById('btn-voltar-carrinho').addEventListener('click', () => {
+        window.location.href = '/index.html';
+      });
+
+      // 4. Botão confirmar pedido
+      document.getElementById('btn-confirmar-pedido').addEventListener('click', confirmarPedido);
+
+      // 5. Botão ir para pagamento
+      document.getElementById('btn-ir-pagamento').addEventListener('click', () => {
+        // Armazenar ID do pedido em sessionStorage para recuperar na página de pagamento
+        if (idPedidoAtual) {
+          sessionStorage.setItem('idPedidoAtual', idPedidoAtual);
         }
-        // grava método e avança
-        const metodo = document.querySelector('input[name="pagamento"]:checked').value;
-        localStorage.setItem("formaPagamento", metodo);
-        window.location.href = "pagamento.html";
+        window.location.href = '/pagamento.html';
       });
     });
+
+    function exibirCarrinho(carrinho) {
+      const lista = document.getElementById('confirmacao-lista');
+      lista.innerHTML = '';
+
+      if (carrinho.length === 0) {
+        lista.innerHTML = '<li>Carrinho vazio</li>';
+        document.getElementById('btn-confirmar-pedido').disabled = true;
+        return;
+      }
+
+      let total = 0;
+      carrinho.forEach(item => {
+        const subtotal = item.preco * item.quantidade;
+        const li = document.createElement('li');
+        li.textContent = `${item.nomeproduto} x${item.quantidade} – R$ ${subtotal.toFixed(2)}`;
+        lista.appendChild(li);
+        total += subtotal;
+      });
+
+      const liTotal = document.createElement('li');
+      liTotal.textContent = `Total: R$ ${total.toFixed(2)}`;
+      lista.appendChild(liTotal);
+    }
+
+    async function confirmarPedido() {
+      const btn = document.getElementById('btn-confirmar-pedido');
+      const statusMsg = document.getElementById('status-msg');
+      const spinner = document.getElementById('spinner');
+      const statusTexto = document.getElementById('status-texto');
+      const carrinho = getCarrinho();
+
+      if (carrinho.length === 0) {
+        mostrarMensagem('Carrinho vazio!', 'erro');
+        return;
+      }
+
+      // Desabilitar botão e mostrar spinner
+      btn.disabled = true;
+      spinner.style.display = 'inline-block';
+      statusMsg.className = 'status-msg';
+      statusTexto.textContent = 'Processando pedido...';
+      statusMsg.style.display = 'block';
+
+      try {
+        // Chamar API para criar pedido
+        const resultado = await criarPedido(carrinho);
+
+        if (resultado.success) {
+          idPedidoAtual = resultado.pedido.idpedido;
+
+          // Limpar carrinho
+          limparCarrinho();
+
+          // Mostrar sucesso
+          spinner.style.display = 'none';
+          statusMsg.style.display = 'none';
+          
+          // Esconder controles de confirmação e mostrar botão de pagamento
+          document.getElementById('confirmacao-lista').style.display = 'none';
+          document.getElementById('btn-voltar-carrinho').style.display = 'none';
+          document.getElementById('btn-confirmar-pedido').style.display = 'none';
+          document.getElementById('sucesso-msg').style.display = 'block';
+        } else {
+          spinner.style.display = 'none';
+          statusMsg.className = 'status-msg erro';
+          statusTexto.textContent = `Erro: ${resultado.message}`;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        spinner.style.display = 'none';
+        statusMsg.className = 'status-msg erro';
+        statusTexto.textContent = `Erro: ${err.message}`;
+        btn.disabled = false;
+      }
+    }
+
+    function mostrarMensagem(texto, tipo) {
+      const statusMsg = document.getElementById('status-msg');
+      const statusTexto = document.getElementById('status-texto');
+      statusMsg.className = `status-msg ${tipo}`;
+      statusTexto.textContent = texto;
+      statusMsg.style.display = 'block';
+
+      if (tipo === 'sucesso') {
+        setTimeout(() => {
+          statusMsg.style.display = 'none';
+        }, 3000);
+      }
+    }
   </script>
 </body>
 </html>

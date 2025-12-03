@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Verificação PIX - Teste Final</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .steps {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .step {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .step-number {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-content strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .step-content code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d73a49;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .success {
+            background: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            color: white;
+            margin: 20px 0;
+            display: none;
+        }
+        .success.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .terminal {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        .testing {
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste PIX - Verificação Final</h1>
+        <p class="subtitle">Validação do payload gerado em tempo real</p>
+
+        <div class="info-box">
+            <strong>ℹ️ Informação:</strong>
+            Esta página limpa o cache automaticamente e gera um novo PIX para comparação.
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <strong>Clique em "Iniciar Teste"</strong>
+                    <p>Será feito um teste do backend e do payload esperado</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <strong>Após o teste, acesse a página de pagamento</strong>
+                    <p>Vá para <code>/pagamento.html</code> ou <code>/test-pix-console.html</code></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <strong>Copie o payload gerado</strong>
+                    <p>Cole-o na textarea e compare com o backend</p>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="iniciaTeste()">🚀 Iniciar Teste de PIX</button>
+        <button onclick="limpaCacheERecarrega()">🧹 Limpar Cache e Recarregar</button>
+
+        <div id="resultado" class="terminal" style="display: none;"></div>
+        <div id="success" class="success"></div>
+        <div id="testing" class="testing" style="display: none;">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px;">Testando PIX...</p>
+        </div>
+    </div>
+
+    <script>
+        function log(msg) {
+            const resultado = document.getElementById('resultado');
+            resultado.textContent += msg + '\n';
+            resultado.scrollTop = resultado.scrollHeight;
+        }
+
+        function showTesting(show) {
+            document.getElementById('testing').style.display = show ? 'block' : 'none';
+            document.getElementById('resultado').style.display = !show ? 'block' : 'none';
+        }
+
+        function showSuccess(msg) {
+            const success = document.getElementById('success');
+            success.textContent = msg;
+            success.classList.add('show');
+            setTimeout(() => { success.classList.remove('show'); }, 3000);
+        }
+
+        async function iniciaTeste() {
+            document.getElementById('resultado').textContent = '';
+            showTesting(true);
+
+            try {
+                log('═══════════════════════════════════════════════════════');
+                log('TESTE DE PIX - Verificação em Tempo Real');
+                log('═══════════════════════════════════════════════════════\n');
+
+                // Teste 1: Backend
+                log('📡 Testando backend...');
+                const respBackend = await fetch('/api/pix/generate?amount=42.00');
+                if (!respBackend.ok) throw new Error(`HTTP ${respBackend.status}`);
+
+                const dataBackend = await respBackend.json();
+                log(`✓ Backend respondeu: CRC=${dataBackend.crc}`);
+                log(`  Tamanho: ${dataBackend.tamanho} bytes`);
+                log(`  Validado: ${dataBackend.validado ? 'SIM' : 'NÃO'}\n`);
+
+                // Teste 2: Parse do payload
+                log('📊 Analisando payload...');
+                function parsePayload(payload) {
+                    const result = [];
+                    let i = 0;
+                    while (i < payload.length) {
+                        const tag = payload.substring(i, i + 2);
+                        const len = parseInt(payload.substring(i + 2, i + 4), 10);
+                        const value = payload.substring(i + 4, i + 4 + len);
+                        result.push({ tag, len, value });
+                        i += 4 + len;
+                    }
+                    return result;
+                }
+
+                const tags = parsePayload(dataBackend.payload);
+                tags.forEach(t => {
+                    log(`  Tag ${t.tag}: '${t.value}' (len=${t.len})`);
+                });
+
+                log('\n✅ Teste completado com sucesso!');
+                log('\nProximas instruções:');
+                log('1. Limpe o cache do navegador (Ctrl+Shift+Delete)');
+                log('2. Acesse /pagamento.html');
+                log('3. Copie o payload gerado');
+                log('4. Compare com o backend acima\n');
+
+                showTesting(false);
+                showSuccess('✅ Teste completo! Agora limpe o cache e teste no navegador.');
+
+            } catch (err) {
+                log(`❌ ERRO: ${err.message}`);
+                showTesting(false);
+                showSuccess('❌ Erro no teste. Verifique se o servidor está rodando.');
+            }
+        }
+
+        function limpaCacheERecarrega() {
+            showSuccess('🧹 Abrindo instruções de limpeza de cache...');
+            alert(`Para limpar o cache manualmente:
+
+1. Pressione: Ctrl + Shift + Delete (Windows/Linux) ou Cmd + Shift + Delete (Mac)
+2. Selecione "Tudo" no período
+3. Marque: ✓ Cookies e dados de sites
+4. Marque: ✓ Arquivos em cache
+5. Clique: "Limpar dados"
+6. Recarregue a página: F5
+
+Você será redirecionado para a página principal em 3 segundos...`);
+
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 5000);
+        }
+
+        // Limpar cache ao carregar
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(reg => reg.unregister());
+            });
+        }
+    </script>
+</body>
+</html>

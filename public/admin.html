@@ -1,76 +1,17 @@
-<!--
-  Painel de Administração do sistema Uener Linguço
-  - Permite gerenciar usuários (adicionar, bloquear, promover, etc.)
-  - Permite gerenciar linguiças (adicionar, editar, remover)
-  - Exibe usuário logado e links de navegação
--->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Administração - Uener Linguço</title>
-  <!-- Importa o CSS principal -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
-</head>
-<body class="admin-page">
-  <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
-  <script>
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.username && !window.location.pathname.endsWith('login.html')) {
-          window.location.replace('/login.html');
-        }
-      });
-  </script>
-  <header class="admin-header">
-    <!-- Logo e título do painel -->
-    <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
-    <h1>Painel de Administração</h1>
-    <a href="/index.html">Voltar ao site</a>
-    <a href="/logout">Sair</a>
-  </header>
-  <main>
-    <!-- Seção de gerenciamento de usuários -->
-    <section class="admin-section">
-      <h2>Gerenciar Usuários</h2>
-      <div id="usuarios-lista"></div>
-      <form id="form-add-usuario">
-        <input type="text" name="username" placeholder="Novo usuário" required />
-        <input type="password" name="password" placeholder="Senha" required />
-        <button type="submit">Adicionar Usuário</button>
-      </form>
-    </section>
-    <!-- Seção de gerenciamento de linguiças -->
-    <section class="admin-section">
-      <h2>Gerenciar Linguiças</h2>
-      <div id="linguicas-lista"></div>
-      <form id="form-add-linguica" enctype="multipart/form-data">
-        <input type="text" name="nome" placeholder="Nome da linguiça" required />
-        <input type="number" name="preco" placeholder="Preço" step="0.01" required />
-        <input type="file" name="imagem" accept="image/*" required />
-        <button type="submit">Adicionar Linguiça</button>
-      </form>
-      <div id="edit-linguica-modal" style="display:none;"></div>
-    </section>
-  </main>
-  <!-- Script principal do painel admin -->
-  <script src="js/admin.js"></script>
-  <!-- Exibe usuário logado no topo -->
-  <script>
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (data.username) {
-          const header = document.querySelector('header');
-          const userSpan = document.createElement('span');
-          userSpan.textContent = `Usuário: ${data.username}`;
-          userSpan.style = 'position:absolute;top:24px;left:32px;font-weight:bold;color:#fff;background:#bb3e03;padding:4px 12px;border-radius:8px;';
-          header.appendChild(userSpan);
-        }
-      });
-  </script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Página Removida</title>
+    <meta http-equiv="refresh" content="3;url=/index.html" />
+    <style>body{font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}</style>
+  </head>
+  <body>
+    <div>
+      <h2>Painel de Administração removido</h2>
+      <p>Esta página foi removida. Você será redirecionado ao site principal.</p>
+      <p><a href="/index.html">Ir agora</a></p>
+    </div>
+  </body>
 </html>

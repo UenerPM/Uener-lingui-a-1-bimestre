@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste PIX Console</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #4ec9b0;
+            margin-top: 20px;
+        }
+        .section {
+            background: #252526;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #007acc;
+            border-radius: 4px;
+        }
+        .code {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .error {
+            color: #f48771;
+        }
+        .success {
+            color: #89d185;
+        }
+        .warning {
+            color: #dcdcaa;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        button:hover {
+            background: #0098ff;
+        }
+        #output {
+            background: #1e1e1e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste PIX Console</h1>
+        
+        <div class="section">
+            <h2>📋 Instruções</h2>
+            <p>1. Clique em <strong>"Testar Payload Frontend Atual"</strong> para gerar um novo PIX</p>
+            <p>2. Clique em <strong>"Validar Payload do Backend"</strong> para comparar com o servidor</p>
+            <p>3. Clique em <strong>"Limpar Cache (Ctrl+Shift+Delete)"</strong> se o payload ainda estiver errado</p>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Controles</h2>
+            <button onclick="testFrontendPix()">Testar Payload Frontend Atual</button>
+            <button onclick="testBackendPix()">Validar Payload do Backend</button>
+            <button onclick="comparePix()">Comparar Frontend vs Backend</button>
+            <button onclick="clearOutput()">Limpar Saída</button>
+        </div>
+
+        <div class="section">
+            <h2>📊 Saída</h2>
+            <div id="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>💡 Dicas</h2>
+            <ul>
+                <li>Se o payload continuar errado, limpe o cache: <strong>Ctrl + Shift + Delete</strong></li>
+                <li>Feche o servidor e reinicie: <strong>npm start</strong></li>
+                <li>Verifique a aba Network do DevTools para confirmar que pagamento.js está sendo carregado corretamente</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function output(text) {
+            const el = document.getElementById('output');
+            el.textContent += text + '\n';
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+        }
+
+        function crc16Ccitt(str) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < str.length; i++) {
+                crc ^= str.charCodeAt(i) << 8;
+                for (let j = 0; j < 8; j++) {
+                    if (crc & 0x8000) {
+                        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+                    } else {
+                        crc = (crc << 1) & 0xFFFF;
+                    }
+                }
+            }
+            return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+        }
+
+        function removerDiacriticos(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function tag(id, value) {
+            const v = String(value || '');
+            const len = String(v.length).padStart(2, '0');
+            return id + len + v;
+        }
+
+        function construirPayloadPixLocal(valor) {
+            const pixKey = 'uperesmarcon@gmail.com';
+            const merchantName = removerDiacriticos('UENER LINGUÇO').substring(0, 25);
+            const merchantCity = removerDiacriticos('CAMPO MOURAO').substring(0, 15);
+            const txId = 'UEN' + Date.now().toString().slice(-8);
+
+            let payload = '';
+            payload += tag('00', '01');
+
+            const mai = tag('00', 'BR.GOV.BCB.PIX') + tag('01', pixKey);
+            payload += tag('26', mai);
+
+            payload += tag('52', '0000');
+            payload += tag('53', '986');
+            payload += tag('54', valor.toFixed(2));
+            payload += tag('58', 'BR');
+            payload += tag('59', merchantName);
+            payload += tag('60', merchantCity);
+
+            const additionalData = tag('05', txId);
+            payload += tag('62', additionalData);
+
+            const payloadComCrc = payload + '6304';
+            const crcValue = crc16Ccitt(payloadComCrc);
+            payload += tag('63', crcValue);
+
+            return payload;
+        }
+
+        function parsePayload(payload) {
+            const result = [];
+            let i = 0;
+            while (i < payload.length) {
+                const tag = payload.substring(i, i + 2);
+                const len = parseInt(payload.substring(i + 2, i + 4), 10);
+                const value = payload.substring(i + 4, i + 4 + len);
+                result.push({ tag, len, value });
+                i += 4 + len;
+            }
+            return result;
+        }
+
+        async function testFrontendPix() {
+            clearOutput();
+            output('═══════════════════════════════════════════════════');
+            output('TESTE FRONTEND PIX LOCAL');
+            output('═══════════════════════════════════════════════════\n');
+
+            try {
+                const valor = 520.00;
+                const payload = construirPayloadPixLocal(valor);
+                
+                output(`✓ Payload gerado (valor: R$ ${valor.toFixed(2)})`);
+                output(`Tamanho: ${payload.length} caracteres\n`);
+                
+                output(`Payload completo:\n${payload}\n`);
+                
+                const tags = parsePayload(payload);
+                output('Tags encontradas:');
+                tags.forEach(t => {
+                    output(`  Tag ${t.tag} (len=${t.len}): '${t.value}'`);
+                });
+
+                // Verificar GUI
+                const guiTag = tags.find(t => t.tag === '26');
+                if (guiTag && guiTag.value.includes('BR.GOV.BCB.PIX')) {
+                    output('\n✓ GUI está em MAIÚSCULO (correto)');
+                } else if (guiTag && guiTag.value.includes('br.gov.bcb.pix')) {
+                    output('\n✗ GUI está em MINÚSCULO (ERRO! Limpe o cache)');
+                }
+
+                // Verificar valor
+                const valorTag = tags.find(t => t.tag === '54');
+                if (valorTag && valorTag.value === '520.00') {
+                    output('✓ Valor está correto: 520.00');
+                } else {
+                    output(`✗ Valor está errado: ${valorTag?.value || 'NÃO ENCONTRADO'}`);
+                }
+
+            } catch (err) {
+                output(`<span class="error">✗ ERRO: ${err.message}</span>`);
+            }
+        }
+
+        async function testBackendPix() {
+            clearOutput();
+            output('═══════════════════════════════════════════════════');
+            output('TESTE BACKEND PIX');
+            output('═══════════════════════════════════════════════════\n');
+
+            try {
+                const resp = await fetch('/api/pix/generate?amount=520.00');
+                if (!resp.ok) {
+                    throw new Error(`HTTP ${resp.status}`);
+                }
+                
+                const data = await resp.json();
+                
+                output(`✓ Backend respondeu com sucesso`);
+                output(`Payload: ${data.payload.substring(0, 50)}...`);
+                output(`CRC: ${data.crc}`);
+                output(`Validado: ${data.validado ? 'SIM ✓' : 'NÃO ✗'}`);
+                output(`Tamanho: ${data.tamanho} caracteres\n`);
+
+                const tags = parsePayload(data.payload);
+                output('Tags encontradas:');
+                tags.forEach(t => {
+                    output(`  Tag ${t.tag} (len=${t.len}): '${t.value}'`);
+                });
+
+            } catch (err) {
+                output(`<span class="error">✗ ERRO: ${err.message}</span>\n`);
+                output('Certifique-se que o servidor está rodando em http://localhost:3000');
+            }
+        }
+
+        async function comparePix() {
+            clearOutput();
+            output('═══════════════════════════════════════════════════');
+            output('COMPARAÇÃO FRONTEND vs BACKEND');
+            output('═══════════════════════════════════════════════════\n');
+
+            try {
+                // Frontend
+                const payloadFrontend = construirPayloadPixLocal(520.00);
+                
+                // Backend
+                const resp = await fetch('/api/pix/generate?amount=520.00');
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                const payloadBackend = data.payload;
+
+                output(`Frontend tamanho: ${payloadFrontend.length}`);
+                output(`Backend tamanho:  ${payloadBackend.length}\n`);
+
+                const tagsFrontend = parsePayload(payloadFrontend);
+                const tagsBackend = parsePayload(payloadBackend);
+
+                output('FRONTEND tags:');
+                tagsFrontend.forEach(t => {
+                    output(`  ${t.tag}: '${t.value}'`);
+                });
+
+                output('\nBACKEND tags:');
+                tagsBackend.forEach(t => {
+                    output(`  ${t.tag}: '${t.value}'`);
+                });
+
+                // Verificar discrepâncias
+                output('\n═══════════════════════════════════════════════════');
+                output('ANÁLISE');
+                output('═══════════════════════════════════════════════════\n');
+
+                if (payloadFrontend === payloadBackend) {
+                    output('✓ Payloads são IDÊNTICOS!');
+                } else {
+                    output('⚠ Payloads diferem:');
+                    
+                    for (let i = 0; i < Math.min(tagsFrontend.length, tagsBackend.length); i++) {
+                        const tf = tagsFrontend[i];
+                        const tb = tagsBackend[i];
+                        if (tf.tag !== tb.tag || tf.value !== tb.value) {
+                            output(`  Tag ${tf.tag}: Frontend='${tf.value}' vs Backend='${tb.value}'`);
+                        }
+                    }
+                }
+
+            } catch (err) {
+                output(`<span class="error">✗ ERRO: ${err.message}</span>`);
+            }
+        }
+
+        // Auto-run test on load
+        window.addEventListener('load', () => {
+            output('Página carregada! Clique em um botão para testar.');
+        });
+    </script>
+</body>
+</html>

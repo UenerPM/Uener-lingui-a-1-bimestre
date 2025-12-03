@@ -176,14 +176,43 @@
 </head>
 <body>
   <!-- Proteção de rota: redireciona para login se não estiver autenticado -->
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
   <script>
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.username && !window.location.pathname.endsWith('login.html')) {
-          window.location.replace('/login.html');
-        }
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await verificarSessao();
+      if (!user) {
+        window.location.replace('/login.html');
+        return;
+      }
+
+      // Carregar e renderizar produtos
+      const produtos = await carregarProdutos();
+      renderizarProdutos(produtos, 'produtos-lista');
+
+      // Atualizar displays
+      atualizarCarrinhoDOM('#carrinho-lista', '#carrinho-total');
+      updateQtdDisplay();
+
+      // Mostrar usuário na header
+      const header = document.querySelector('header');
+      const userSpan = document.createElement('span');
+      userSpan.textContent = `${user.nomepessoa}`;
+      userSpan.style = 'position:absolute;top:24px;left:32px;font-weight:bold;color:#fff;background:#bb3e03;padding:4px 12px;border-radius:8px;';
+      header.appendChild(userSpan);
+
+      // Botão de logout
+      const logoutBtn = document.createElement('a');
+      logoutBtn.href = '#';
+      logoutBtn.textContent = 'Sair';
+      logoutBtn.className = 'logout-btn';
+      logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await fazerLogout();
+        window.location.href = '/login.html';
       });
+      header.appendChild(logoutBtn);
+    });
   </script>
   <header>
     <!-- Logo e título do site -->
@@ -200,30 +229,11 @@
     <section class="carrinho">
       <h2>Carrinho</h2>
       <ul id="carrinho-lista"></ul>
+      <div id="carrinho-total">R$ 0,00</div>
       <a href="confirmacao.html" id="confirmar-pedido" class="botao">Confirmar Pedido</a>
     </section>
   </main>
   <!-- Scripts principais da página -->
-  <script src="js/script.js"></script>
-  <script src="js/admin_button.js"></script>
-  <!-- Exibe usuário logado e botão de logout -->
-  <script>
-    fetch('/api/session')
-      .then(res => res.json())
-      .then(data => {
-        if (data.username) {
-          const header = document.querySelector('header');
-          const userSpan = document.createElement('span');
-          userSpan.textContent = `Usuário: ${data.username}`;
-          userSpan.style = 'position:absolute;top:24px;left:32px;font-weight:bold;color:#fff;background:#bb3e03;padding:4px 12px;border-radius:8px;';
-          header.appendChild(userSpan);
-          const btn = document.createElement('a');
-          btn.href = '/logout';
-          btn.textContent = 'Sair';
-          btn.className = 'logout-btn';
-          header.appendChild(btn);
-        }
-      });
-  </script>
+  <!-- app-avap2.js já foi incluído acima -->
 </body>
 </html>

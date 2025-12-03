@@ -1,0 +1,280 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                  ✅ SISTEMA DE IMAGENS DINÂMICAS - ENTREGA COMPLETA           ║
+║                                                                              ║
+║                         Data: 2 de dezembro de 2025                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ARQUIVOS CRIADOS E MODIFICADOS                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✨ CRIADOS (Novos)
+  ├─ src/routes/imagem.js
+  │  └─ Rota proxy /api/imagem?path=... com segurança e fallback
+  │     • Valida caminho (sem path traversal)
+  │     • Busca em EXTERNAL_IMAGES_PATH
+  │     • Streams eficientes
+  │     • Logs [imagem] para debug
+  │
+  ├─ TESTE_IMAGENS.ps1
+  │  └─ Script com exemplos de teste (PowerShell, curl, navegador)
+  │
+  ├─ GUIA_IMAGENS_COMPLETO.md
+  │  └─ Documentação completa: setup, uso, segurança, troubleshooting
+  │
+  └─ .env.example (atualizado)
+     └─ Adicionadas variáveis de imagem e PIX
+
+🔧 MODIFICADOS (Existentes)
+  ├─ app.js
+  │  └─ Adicionou:
+  │     • const imagemRoute = require('./src/routes/imagem');
+  │     • app.use('/api/imagem', imagemRoute);
+  │     • app.use('/imgs', express.static(EXTERNAL_IMAGES_PATH));
+  │     • app.use('/uploads', express.static(EXTERNAL_IMAGES_PATH));
+  │
+  └─ public/js/script.js
+     └─ Adicionou helper construirUrlImagem():
+        • Converte /imgs/... em /api/imagem?path=/imgs/...
+        • Fallback automático
+        • Integrado em carregarProdutos()
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  FLUXO DE FUNCIONAMENTO                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+ANTES (❌ Não funcionava)
+┌─────────────┐
+│   Banco     │  imagem = "/imgs/produtos/salada.png"
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────────────────────┐
+│ Frontend: <img src="/imgs/produtos/..." />  │  ❌ 404 (arquivo não existe em public/)
+└─────────────────────────────────────────────┘
+
+DEPOIS (✅ Funciona!)
+┌─────────────┐
+│   Banco     │  imagem = "/imgs/produtos/salada.png"
+└──────┬──────┘
+       │
+       ▼ carregarProdutos()
+┌──────────────────────────────────────────────────────────────┐
+│ construirUrlImagem() transforma em:                           │
+│ /api/imagem?path=/imgs/produtos/salada.png                  │
+└───────────────┬──────────────────────────────────────────────┘
+                │
+                ▼ GET /api/imagem?path=...
+        ┌───────────────────────┐
+        │ imagem.js (Router)    │
+        │ 1. Valida path ✓      │
+        │ 2. Resolve caminho ✓  │
+        │ 3. Busca arquivo ✓    │
+        │ 4. Stream ao browser ✓│
+        └───────────┬───────────┘
+                    │
+        ┌───────────▼──────────┐
+        │ Navegador renderiza  │
+        │ imagem com sucesso ✅ │
+        └──────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SEGURANÇA IMPLEMENTADA                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+🔒 Proteções Ativas:
+
+1. Path Traversal Bloqueado
+   ❌ /api/imagem?path=/../../../etc/passwd      → retorna fallback
+   ❌ /api/imagem?path=/admin/config.json        → retorna fallback
+   ✅ /api/imagem?path=/imgs/produtos/salada.png → retorna arquivo
+
+2. Diretórios Whitelist
+   ✅ Permitidos: /imgs, /uploads, /images, /fotos
+   ❌ Bloqueados: /admin, /config, /private, tudo mais
+
+3. Validação Dupla
+   • isPathSafe(): rejeita (..), paths absolutos
+   • Confinamento: resolve + compara com base
+
+4. MIME-Type Seguro
+   • Detecta tipo automaticamente
+   • Headers Content-Type corretos
+   • Previne MIME-sniffing attacks
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  CONFIGURAÇÃO (3 PASSOS)                                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✏️  PASSO 1: Configurar .env
+─────────────────────────────
+
+# Windows
+EXTERNAL_IMAGES_PATH=C:\Users\seu-usuario\Projetos\crud-project\public
+
+# Linux/Mac
+EXTERNAL_IMAGES_PATH=/home/seu-usuario/projetos/crud-project/public
+
+💡 Dica: Certifique-se que:
+   • Caminho existe
+   • Contém /imgs ou /uploads
+   • Imagens estão lá (ex: {PATH}/imgs/produtos/salada.png)
+
+📋 PASSO 2: Verificar Banco
+────────────────────────────
+
+SELECT DISTINCT imagem FROM produto LIMIT 5;
+
+Deve retornar caminhos como:
+  /imgs/produtos/salada.png
+  /imgs/linguicas/caseira.jpg
+  /uploads/promo1.png
+
+❌ Errado: salada.png, C:\Users\...\salada.png, http://localhost/...
+
+🚀 PASSO 3: Reiniciar Servidor
+───────────────────────────────
+
+npm run dev
+# Deve aparecer nos logs:
+# [app] Servindo /imgs de: C:\Users\...\crud-project\public
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  TESTE RÁPIDO (PowerShell)                                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+# 1. Testar endpoint com arquivo
+Invoke-RestMethod "http://localhost:3000/api/imagem?path=/imgs/produtos/salada.png" `
+  -OutFile test.png
+if (Test-Path test.png) { Write-Host "✓ Imagem baixada" }
+
+# 2. Testar path traversal (deve falhar + retornar fallback)
+Invoke-RestMethod "http://localhost:3000/api/imagem?path=/../../../etc/passwd" `
+  -OutFile test_attack.bin
+
+# 3. Testar rota estática (se EXTERNAL_IMAGES_PATH configurado)
+Invoke-RestMethod "http://localhost:3000/imgs/produtos/salada.png" -OutFile test_static.png
+
+# 4. Limpar testes
+Remove-Item -Force test.png, test_attack.bin, test_static.png -ErrorAction SilentlyContinue
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  EXEMPLO DE USO NO HTML/JS                                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+<!-- Antes (❌) -->
+<img src="/imgs/produtos/salada.png" />
+
+<!-- Depois (✅) - Renderizado automaticamente -->
+<img src="/api/imagem?path=/imgs/produtos/salada.png" 
+     onerror="this.src='/imgs/default.png'" />
+
+<!-- Ou usando a helper -->
+<script>
+const url = construirUrlImagem('/imgs/produtos/salada.png');
+// retorna: /api/imagem?path=/imgs/produtos/salada.png
+document.querySelector('img').src = url;
+</script>
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  LOGS NO TERMINAL (Verificar Funcionamento)                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✅ Tudo OK:
+   [imagem] Requisição: /imgs/produtos/salada.png
+   [imagem] Resolvido para: C:\Users\...\imgs\produtos\salada.png
+   [imagem] MIME type detectado: image/png
+   [imagem] ✓ Servindo arquivo: /imgs/produtos/salada.png (15234 bytes)
+
+❌ Arquivo não encontrado (fallback ativado):
+   [imagem] Arquivo não encontrado: C:\Users\...\imgs\xxx.png
+   [imagem] ✓ Servindo fallback: public/img/no-image.png
+
+❌ Path traversal bloqueado:
+   [imagem] Path traversal bloqueado: /../../../etc/passwd
+   [imagem] ✓ Servindo fallback: public/img/no-image.png
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  TROUBLESHOOTING RÁPIDO                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+❌ PROBLEMA: Imagens não aparecem (branco ou x)
+
+✓ Solução 1: Verificar EXTERNAL_IMAGES_PATH
+   Get-Content .env | Select-String EXTERNAL_IMAGES_PATH
+   # Deve mostrar um caminho válido, não vazio
+
+✓ Solução 2: Verificar caminho existe
+   Test-Path "C:\Users\seu-usuario\Projetos\crud-project\public"
+   # Deve retornar $true
+
+✓ Solução 3: Verificar imagens existem
+   dir "C:\Users\...\public\imgs\produtos\"
+   # Deve listar arquivos (salada.png, etc)
+
+✓ Solução 4: Ver logs do servidor
+   # Procurar por [imagem] ❌ ou ✓ nos logs
+   # Se ver "Arquivo não encontrado" → caminho errado no banco
+
+─────────────────────────────────────────────────────────────────────────────
+
+❌ PROBLEMA: Erro 400 ao chamar /api/imagem
+
+✓ Solução: Verificar parâmetro
+   ❌ Errado: http://localhost:3000/api/imagem
+   ✅ Certo:  http://localhost:3000/api/imagem?path=/imgs/...
+
+─────────────────────────────────────────────────────────────────────────────
+
+❌ PROBLEMA: Path traversal não bloqueado (RISCO DE SEGURANÇA!)
+
+✓ Solução: Verificar que rota rejeita (..)
+   Invoke-RestMethod "http://localhost:3000/api/imagem?path=/../../../etc/passwd" `
+     -OutFile test.bin
+   # Deve retornar PNG (no-image.png), não conteúdo de texto
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PRÓXIMOS PASSOS (OPCIONAL)                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. 🎨 Compressão automática
+   • Usar `sharp` para redimensionar on-the-fly
+   • Ex: /api/imagem?path=...&size=300x300
+
+2. ⚡ Cache melhorado
+   • Cache-Control: max-age=2592000 (30 dias)
+   • ETags para validar se precisa recarregar
+
+3. 📱 WebP support
+   • Detectar navegador
+   • Servir .webp se disponível, fallback .png
+
+4. ☁️  CDN Integration
+   • Cloudflare, AWS S3, Azure Blob
+   • Servir imagens via CDN ao invés de stream local
+
+5. 📊 Analytics
+   • Rastrear hits/misses
+   • Monitorar erros 404
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  RESUMO FINAL                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✅ COMPLETO E FUNCIONAL:
+
+  • ✓ Rota proxy segura /api/imagem?path=...
+  • ✓ Proteção contra path traversal
+  • ✓ Fallback automático para no-image.png
+  • ✓ Streams eficientes para arquivos grandes
+  • ✓ Frontend atualizado (construirUrlImagem helper)
+  • ✓ Logs estruturados [imagem]
+  • ✓ Rota estática /imgs e /uploads como fallback
+  • ✓ Documentação completa
+  • ✓ Exemplos de teste
+
+📝 PRÓXIMO: Configure EXTERNAL_IMAGES_PATH em .env e reinicie o servidor!
+
+═════════════════════════════════════════════════════════════════════════════════
+                         🎉 Entrega Completa! 🎉
+═════════════════════════════════════════════════════════════════════════════════
