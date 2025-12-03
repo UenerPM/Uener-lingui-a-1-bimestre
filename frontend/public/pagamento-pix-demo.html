@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIX EMV-Co BR Code — Demo</title>
+  <link rel="stylesheet" href="css/pagamento-pix-demo.css">
+  
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>💳 PIX EMV-Co BR Code</h1>
+      <p>Gere payloads PIX válidos conforme especificação do Banco Central</p>
+    </header>
+
+    <!-- Status -->
+    <div id="status-pix" class="status-pix"></div>
+
+    <!-- Form -->
+    <form onsubmit="return false;">
+      <div class="form-group">
+        <label for="valor-pix">Valor da Transação (R$)</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="valor-pix"
+            placeholder="12.50"
+            min="0.01"
+            step="0.01"
+            autofocus
+          >
+          <button type="button" id="gerar-pix-btn" class="btn-primary">
+            Gerar PIX
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Resultado -->
+    <div id="resultado-pix">
+      <h2>✓ PIX Gerado com Sucesso!</h2>
+
+      <div class="qr-container">
+        <img id="qr-pix-img" src="" alt="QR Code PIX">
+      </div>
+
+      <p style="color: #666; margin-bottom: 16px;">
+        Escaneie o QR Code acima com seu app bancário
+      </p>
+
+      <div class="payload-section">
+        <h3>Copia e Cola</h3>
+        <textarea id="payload-pix" readonly></textarea>
+        <button type="button" id="copy-pix-btn">
+          📋 Copiar Código PIX
+        </button>
+      </div>
+
+      <div class="tech-details">
+        <h3>Dados Técnicos</h3>
+        <ul>
+          <li><strong>Chave PIX:</strong> uperesmarcon@gmail.com</li>
+          <li><strong>Merchant:</strong> UENER LINGUÇO</li>
+          <li><strong>Cidade:</strong> CAMPO MOURAO</li>
+          <li><strong>Padrão:</strong> EMV-Co BR Code (Banco Central)</li>
+          <li><strong>CRC:</strong> CRC16-XMODEM (validado)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-box">
+      <strong>ℹ️ Como usar:</strong>
+      1. Informe o valor desejado<br>
+      2. Clique em "Gerar PIX"<br>
+      3. Escaneie o QR com seu app bancário<br>
+      4. Ou copie o código "copia e cola"
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="js/pix-frontend.js"></script>
+</body>
+</html>

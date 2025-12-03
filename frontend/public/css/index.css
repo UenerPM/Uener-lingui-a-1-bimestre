@@ -1,0 +1,40 @@
+/* Estilos da página inicial */
+body {
+  background: linear-gradient(135deg, #bb3e03 0%, #f5e7d3 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  color: #232526;
+}
+header {
+  background: #bb3e03;
+  color: #fff;
+  padding: 24px 0 12px 0;
+  text-align: center;
+  border-bottom: 4px solid #fff;
+  margin-bottom: 24px;
+  position: relative;
+}
+header .logo { height: 60px; margin-bottom: 8px; }
+header h1 { font-size: 2.2rem; margin: 0; letter-spacing: 2px; color: #fff; }
+header .subtitulo { color: #fff7e6; font-size: 1.1rem; margin-top: 6px; margin-bottom: 0; }
+.produtos { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; margin-bottom: 32px; }
+.produto { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0002; padding: 18px 18px 14px 18px; width: 220px; display: flex; flex-direction: column; align-items: center; transition: transform 0.15s, box-shadow 0.15s; }
+.produto:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 6px 24px #bb3e0340; }
+.produto img { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 8px #bb3e0320; }
+.produto h3 { color: #bb3e03; margin: 0 0 4px 0; font-size: 1.1rem; }
+.produto p { color: #bb3e03; font-weight: bold; margin: 0 0 10px 0; font-size: 1.1rem; }
+.controle-qtd { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.controle-qtd button { background: #bb3e03; color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.controle-qtd button:hover { background: #fff; color: #bb3e03; border: 1px solid #bb3e03; }
+.carrinho { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #bb3e0320; padding: 24px 20px 16px 20px; max-width: 400px; margin: 0 auto 32px auto; }
+.carrinho h2 { color: #bb3e03; margin-bottom: 16px; text-align: center; }
+#carrinho-lista { list-style: none; padding: 0; margin: 0 0 16px 0; color: #232526; }
+#confirmar-pedido { display: block; width: 100%; background: #bb3e03; color: #fff; border: none; border-radius: 6px; padding: 12px; font-size: 1.1rem; font-weight: bold; text-align: center; text-decoration: none; margin-top: 10px; transition: background 0.2s, color 0.2s; }
+#confirmar-pedido:hover { background: #fff; color: #bb3e03; border: 1px solid #bb3e03; }
+.logout-btn { position: absolute; top: 24px; right: 32px; color: #fff; font-weight: bold; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+.logout-btn:hover { color: #bb3e03; }
+@media (max-width: 700px) {
+  .produtos { flex-direction: column; align-items: center; }
+  .carrinho { max-width: 98vw; }
+}

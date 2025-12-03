@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento — Uener Linguço</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/pagamento.css">
+  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <!-- Redesign Completo 2025 -->
+  
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <img src="img/logo.png" alt="Logo Uener Linguço">
+    <h1>Pagamento</h1>
+  </header>
+
+  <!-- Main -->
+  <main class="container">
+    <div class="card">
+      <!-- Status inicial -->
+      <div id="status-msg" class="status-msg"></div>
+
+      <!-- Sucesso -->
+      <div id="sucesso-msg">
+        <p>✓ Pagamento realizado com sucesso!</p>
+        <p>Você será redirecionado em breve...</p>
+      </div>
+
+      <!-- Conteúdo principal -->
+      <div id="conteudo-principal">
+        <!-- Total -->
+        <div class="total-banner">
+          Total: R$ <span id="total-valor">0,00</span>
+        </div>
+
+        <!-- Itens do pedido -->
+        <div class="pedido-itens" id="pedido-itens">
+          <p style="text-align: center; color: #999;">Carregando itens...</p>
+        </div>
+
+        <!-- Formas de pagamento -->
+        <div class="formas-wrap">
+          <h3>Forma de Pagamento</h3>
+          <div id="formas-list" class="formas-fieldset">
+            <p style="text-align: center; color: #999;">Carregando formas...</p>
+          </div>
+        </div>
+
+        <!-- Container PIX -->
+        <div id="pix-container">
+          <h4>Pagamento via PIX</h4>
+          <p class="pix-help">Escaneie o QR Code com seu app bancário ou copie o código</p>
+          <div class="qr-placeholder">
+            <img id="qr-img" src="" alt="QR Code PIX">
+          </div>
+          <p class="pix-help">Copia e cola:</p>
+          <textarea id="pix-payload" class="pix-payload" rows="3" readonly></textarea>
+          <button id="copy-btn" class="copy-btn">Copiar código PIX</button>
+        </div>
+
+        <!-- Container Cartão -->
+        <div id="cartao-container">
+          <h4>Pagamento com Cartão de Crédito</h4>
+          <form id="form-cartao" onsubmit="return false;">
+            <div class="form-group">
+              <label for="numero-cartao">Número do Cartão</label>
+              <input type="text" id="numero-cartao" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="validade">Validade (MM/AA)</label>
+                <input type="text" id="validade" placeholder="MM/AA" maxlength="5" autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" placeholder="123" maxlength="4" autocomplete="off">
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="actions">
+          <button id="concluir" class="btn btn-primary">Concluir Pagamento</button>
+          <button id="voltar" class="btn btn-secondary">← Voltar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
+  <script src="js/pagamento.js"></script>
+</body>
+</html>

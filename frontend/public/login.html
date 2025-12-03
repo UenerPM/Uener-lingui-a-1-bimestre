@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Uener Linguço</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/login.css" />
+  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+  
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <!-- Logo e título -->
+    <img src="img/logo.png" alt="Logo Uener Linguço" class="logo" />
+    <h1>Uener Linguço</h1>
+
+    <!-- Mensagens de erro/sucesso -->
+    <div id="message" class="message"></div>
+
+    <!-- Seção de Login -->
+    <div class="form-section">
+      <h2>Fazer Login</h2>
+      <form id="form-login">
+        <input
+          type="email"
+          id="login-email"
+          placeholder="Email"
+          required
+          autocomplete="email"
+        />
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Senha"
+          required
+          autocomplete="current-password"
+        />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Informações sobre admin -->
+    <div class="adm-info">
+      <p><strong>Sistema de Teste:</strong> Avap2 PostgreSQL</p>
+      <p style="font-size: 0.85rem; color: #999; margin-top: 8px;">
+        Use suas credenciais cadastradas no banco
+      </p>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

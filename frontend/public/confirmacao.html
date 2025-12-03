@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uener Linguço — Confirmação do Pedido</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="css/confirmacao.css" />
+</head>
+<body>
+  <header class="header">
+    <img src="img/logo.png" alt="Logo" class="logo-header">
+    <h1 class="header-title" onclick="window.location.href='index.html'">Uener Linguço</h1>
+  </header>
+
+  <main class="container">
+    <section class="confirmacao">
+      <h2>Confirmação do Pedido</h2>
+
+      <!-- Lista de itens do carrinho -->
+      <ul id="confirmacao-lista" class="confirmacao-lista">
+        <li>Carregando carrinho...</li>
+      </ul>
+
+      <!-- Botões de ação -->
+      <div class="botoes">
+        <button id="btn-voltar-carrinho" class="btn-voltar">← Voltar</button>
+        <button id="btn-confirmar-pedido" class="btn-confirmar">Confirmar Pedido</button>
+      </div>
+
+      <!-- Mensagem de status -->
+      <div id="status-msg" class="status-msg">
+        <span id="status-texto"></span>
+        <span class="spinner" id="spinner"></span>
+      </div>
+
+      <!-- Sucesso: opção de ir para pagamento -->
+      <div id="sucesso-msg">
+        <p>✓ Pedido criado com sucesso!</p>
+        <button id="btn-ir-pagamento" class="btn-confirmar" style="margin-top: 12px;">
+          Ir para Pagamento
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/script.js"></script>
+  <script src="js/app-avap2.js"></script>
+  <script src="js/confirmacao.js"></script>
+</body>
+</html>
