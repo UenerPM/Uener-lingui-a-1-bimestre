@@ -10,25 +10,48 @@ const FuncionarioRepository = {
    * Obtém todos os funcionários
    */
   async getAllFuncionarios() {
-    const query = `
-      SELECT 
-        id, 
-        user_id, 
-        nome_completo, 
-        email, 
-        cpf, 
-        cargo, 
-        salario, 
-        data_admissao, 
-        created_at, 
-        updated_at
-      FROM funcionarios
-      WHERE deleted_at IS NULL
-      ORDER BY nome_completo
-    `;
+    // Tenta consultar a tabela 'funcionarios' padrão. Se não existir, tenta alternativas
+    const queries = [
+      // padrão: nomes de colunas do modelo novo (tabela 'funcionarios')
+      `SELECT id, user_id, nome_completo AS nome, email, cpf, cargo, salario, data_admissao, created_at, updated_at FROM funcionarios WHERE deleted_at IS NULL ORDER BY nome_completo`,
+      // variação avap2: tabela 'funcionario' com referência a 'pessoa' e 'cargo'
+      `SELECT f.pessoacpfpessoa AS cpf, p.nomepessoa AS nome, p.email AS email, f.salario AS salario, c.nomecargo AS cargo
+       FROM funcionario f
+       LEFT JOIN pessoa p ON f.pessoacpfpessoa = p.cpfpessoa
+       LEFT JOIN cargo c ON f.cargosidcargo = c.idcargo
+       ORDER BY p.nomepessoa`,
+      // fallback: buscar pessoas que são funcionários (quando dados estão separados)
+      `SELECT p.cpfpessoa AS cpf, p.nomepessoa AS nome, p.email AS email, NULL AS salario, NULL AS cargo
+       FROM pessoa p
+       WHERE p.cpfpessoa IN (SELECT pessoacpfpessoa FROM funcionario)
+       ORDER BY p.nomepessoa`
+    ];
 
-    const result = await pool.query(query);
-    return result.rows;
+    for (const q of queries) {
+      try {
+        const result = await pool.query(q);
+        if (result && result.rows) {
+          // Normalizar nomes de campos para um formato único
+          return result.rows.map(r => ({
+            id: r.id || null,
+            cpf: r.cpf || r.pessoacpfpessoa || r.cpfpessoa || null,
+            nome: r.nome || r.nome_completo || r.nomepessoa || null,
+            email: r.email || null,
+            cargo: r.cargo || null,
+            salario: r.salario || null,
+            data_admissao: r.data_admissao || null
+          }));
+        }
+      } catch (err) {
+        // Se tabela não existir (erro 42P01), tentar próximo query. Outros erros são lançados.
+        if (err.code === '42P01') continue;
+        console.error('funcionarioRepository.getAllFuncionarios error:', err.message);
+        throw err;
+      }
+    }
+
+    // Se nenhuma query retornou dados, retornar array vazio
+    return [];
   },
 
   /**

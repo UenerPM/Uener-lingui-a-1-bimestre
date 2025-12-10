@@ -37,8 +37,8 @@ const PORT = process.env.PORT || 3000;
 
 // ===== MIDDLEWARE =====
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files (projeto mantém `public/` no diretório raiz do repositório)
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Body parsing
 app.use(express.urlencoded({ extended: true }));

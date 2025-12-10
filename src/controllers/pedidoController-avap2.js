@@ -35,21 +35,33 @@ const PedidoController = {
         return jsonError(res, 'Total do pedido inválido', 400);
       }
 
-      // Selecionar um funcionário disponível para associar ao pedido
+      // Criar pedido
+      // Selecionar atendente ativo aleatoriamente (compatível com variações de schema)
+      async function getActiveFuncionariosList(client) {
+        try {
+          const r = await client.query('SELECT cpf FROM funcionarios WHERE deleted_at IS NULL');
+          if (r && r.rowCount > 0) return r.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const r2 = await client.query('SELECT pessoacpfpessoa as cpf FROM funcionario');
+          if (r2 && r2.rowCount > 0) return r2.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const fr = await funcionarioRepo.getAllFuncionarios();
+          if (Array.isArray(fr) && fr.length > 0) return fr.map(f => f.cpf || f.pessoacpfpessoa || f.cpfpessoa);
+        } catch (e) {}
+        return [];
+      }
+
+      // Usar service para criar pedido com itens (seleção de atendente já ocorrida no service)
       try {
-        const funcionarios = await funcionarioRepo.getAllFuncionarios();
-        if (!Array.isArray(funcionarios) || funcionarios.length === 0) {
-          return jsonError(res, 'Nenhum funcionário disponível para processar o pedido', 503);
-        }
-
-        const chosen = funcionarios[Math.floor(Math.random() * funcionarios.length)];
-        const funcionarioCpf = chosen.cpf || chosen.pessoacpfpessoa || chosen.cpfpessoa || null;
-        if (!funcionarioCpf) {
-          return jsonError(res, 'Funcionário escolhido não possui CPF válido', 500);
-        }
-
-        const pedidoCriado = await pedidoService.createPedidoWithItems(cpfpessoa, itens, total, funcionarioCpf);
-        return jsonSuccess(res, { pedido: pedidoCriado }, 'Pedido criado com sucesso', 201);
+        const pedidoCriado = await pedidoService.createPedidoWithItems(cpfpessoa, itens, total, null);
+        return jsonSuccess(
+          res,
+          { pedido: pedidoCriado },
+          'Pedido criado com sucesso',
+          201
+        );
       } catch (err) {
         console.error('❌ Erro ao criar pedido via service:', err.message);
         return jsonError(res, err.message || 'Erro ao criar pedido', 500);
@@ -114,32 +126,6 @@ const PedidoController = {
       console.error('❌ Erro ao buscar pedido:', err.message);
       return jsonError(res, err.message || 'Erro ao buscar pedido', 500);
     }
-  }
-  ,
-
-  // Adaptadores para compatibilidade com rotas existentes
-  async listar(req, res) {
-    return this.getPedidosUsuario(req, res);
-  },
-
-  async obter(req, res) {
-    return this.getPedidoById(req, res);
-  },
-
-  async criar(req, res) {
-    return this.createPedido(req, res);
-  },
-
-  async atualizar(req, res) {
-    return jsonError(res, 'Atualizar pedido não implementado', 501);
-  },
-
-  async listarTodos(req, res) {
-    return jsonError(res, 'Listar todos os pedidos (admin) não implementado', 501);
-  },
-
-  async deletar(req, res) {
-    return jsonError(res, 'Deletar pedido não implementado', 501);
   }
 };
 

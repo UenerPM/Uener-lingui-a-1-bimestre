@@ -3,27 +3,49 @@ const bcrypt = require('bcryptjs');
 
 /**
  * Login do usuário
+ * Compatível com repositórios avap2 (validateCredentials) e genéricos
  */
 async function login(email, senha) {
   try {
     if (!email || !senha) throw new Error('Email e senha são obrigatórios');
-    
+
+    // Preferir método validateCredentials do repositório se existir
+    if (typeof authRepository.validateCredentials === 'function') {
+      const validated = await authRepository.validateCredentials(email, senha);
+      if (!validated) throw new Error('Credenciais inválidas');
+
+      // Se o repositório já validou, retorna objeto padronizado
+      return {
+        id: validated.id || validated.idpessoa || null,
+        cpf: validated.cpf || validated.cpfpessoa || null,
+        nome: validated.nome || validated.nomepessoa || null,
+        email: validated.email || email,
+        isAdmin: validated.isAdmin || validated.isadmin || false
+      };
+    }
+
+    // Fallback: buscar usuário e comparar senha com bcrypt
     const usuario = await authRepository.getUserByEmail(email);
     if (!usuario) throw new Error('Usuário não encontrado');
-    
-    // Verificar se senha está correta
-    const senhaValida = await bcrypt.compare(senha, usuario.senha || usuario.password || '');
-    if (!senhaValida) throw new Error('Senha incorreta');
-    
+
+    const senhaHash = usuario.senha || usuario.password || usuario.senha_pessoa || '';
+    // Se não houver hash, comparar diretamente (inseguro)
+    if (!senhaHash) {
+      if (senha !== '') throw new Error('Senha incorreta');
+    } else {
+      const senhaValida = await bcrypt.compare(senha, String(senhaHash));
+      if (!senhaValida) throw new Error('Senha incorreta');
+    }
+
     return {
-      id: usuario.id || usuario.idpessoa,
-      cpf: usuario.cpf || usuario.pessoaCpfPessoa,
-      nome: usuario.nome,
+      id: usuario.id || usuario.idpessoa || null,
+      cpf: usuario.cpf || usuario.pessoaCpfPessoa || usuario.cpfpessoa || null,
+      nome: usuario.nome || usuario.nomepessoa || null,
       email: usuario.email,
       isAdmin: usuario.isadmin || usuario.is_admin || false
     };
   } catch (error) {
-    console.error('[AuthService] Erro no login:', error);
+    console.error('[AuthService] Erro no login:', error.message || error);
     throw error;
   }
 }

@@ -1,0 +1,344 @@
+{
+  "connected": true,
+  "tables": [
+    {
+      "schema": "public",
+      "name": "cargo",
+      "columns": [
+        {
+          "column_name": "idcargo",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "nomecargo",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "cliente",
+      "columns": [
+        {
+          "column_name": "pessoacpfpessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "rendacliente",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "datadecadastrocliente",
+          "data_type": "date",
+          "is_nullable": "YES"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "formadepagamento",
+      "columns": [
+        {
+          "column_name": "idformapagamento",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "nomeformapagamento",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "funcionario",
+      "columns": [
+        {
+          "column_name": "pessoacpfpessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "salario",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "cargosidcargo",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "porcentagemcomissao",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "imagem",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "caminho",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "pagamento",
+      "columns": [
+        {
+          "column_name": "pedidoidpedido",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "datapagamento",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "valortotalpagamento",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "forma_pagamento_id",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "pedido",
+      "columns": [
+        {
+          "column_name": "idpedido",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "datadopedido",
+          "data_type": "date",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "clientepessoacpfpessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "funcionariopessoacpfpessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "pedidohasproduto",
+      "columns": [
+        {
+          "column_name": "produtoidproduto",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "pedidoidpedido",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "quantidade",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "precounitario",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "pessoa",
+      "columns": [
+        {
+          "column_name": "cpfpessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "nomepessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "datanascimentopessoa",
+          "data_type": "date",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "numero",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "cep",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "email",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "senha_pessoa",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "data_acesso",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "produto",
+      "columns": [
+        {
+          "column_name": "idproduto",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "nomeproduto",
+          "data_type": "character varying",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "quantidadeemestoque",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "precounitario",
+          "data_type": "numeric",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "id_imagem",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "table_schema": "public",
+      "table_name": "cliente",
+      "column_name": "pessoacpfpessoa"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "funcionario",
+      "column_name": "pessoacpfpessoa"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "pedido",
+      "column_name": "clientepessoacpfpessoa"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "pedido",
+      "column_name": "funcionariopessoacpfpessoa"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "pessoa",
+      "column_name": "email"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "pessoa",
+      "column_name": "senha_pessoa"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "pessoa",
+      "column_name": "cpfpessoa"
+    }
+  ],
+  "approx_counts": [
+    {
+      "schema_name": "public",
+      "table_name": "pessoa",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "cliente",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "funcionario",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "cargo",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "pedido",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "pedidohasproduto",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "formadepagamento",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "pagamento",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "produto",
+      "approx_rows": "-1"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "imagem",
+      "approx_rows": "-1"
+    }
+  ]
+}

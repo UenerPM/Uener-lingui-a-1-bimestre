@@ -69,7 +69,57 @@ async function getPessoaById(cpfpessoa) {
   }
 }
 
+async function getUserByEmail(email) {
+  try {
+    const res = await pool.query('SELECT * FROM pessoa WHERE email = $1 LIMIT 1', [email]);
+    return res.rows[0] || null;
+  } catch (err) {
+    console.error('authRepository.getUserByEmail error:', err.message);
+    return null;
+  }
+}
+
+async function createUser(email, senhaHash, nome = null, cpf = null) {
+  try {
+    // Tenta inserir na tabela `pessoa`. Se CPF não for fornecido e for obrigatório,
+    // o banco pode rejeitar a operação. Logamos e lançamos o erro para o service tratar.
+    const cols = ['email', 'senha_pessoa'];
+    const params = [email, senhaHash];
+    let idx = 3;
+    if (nome) {
+      cols.push('nomepessoa');
+      params.push(nome);
+      idx++;
+    }
+    if (cpf) {
+      cols.push('cpfpessoa');
+      params.push(cpf);
+      idx++;
+    }
+
+    const q = `INSERT INTO pessoa (${cols.join(',')}) VALUES (${cols.map((_, i) => '$' + (i + 1)).join(',')}) RETURNING *`;
+    const r = await pool.query(q, params);
+    return r.rows[0];
+  } catch (err) {
+    console.error('authRepository.createUser error:', err.message);
+    throw err;
+  }
+}
+
+async function updatePassword(email, novaHash) {
+  try {
+    const res = await pool.query('UPDATE pessoa SET senha_pessoa = $1 WHERE email = $2 RETURNING *', [novaHash, email]);
+    return res.rows[0] || null;
+  } catch (err) {
+    console.error('authRepository.updatePassword error:', err.message);
+    throw err;
+  }
+}
+
 module.exports = {
   validateCredentials,
-  getPessoaById
+  getPessoaById,
+  getUserByEmail,
+  createUser,
+  updatePassword
 };

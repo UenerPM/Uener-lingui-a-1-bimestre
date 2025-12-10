@@ -23,10 +23,6 @@ const ProdutoController = {
     }
   },
 
-  /**
-   * GET /api/produtos/:id
-   * Busca um produto específico
-   */
   async getProdutoById(req, res) {
     try {
       const { id } = req.params;
@@ -42,6 +38,49 @@ const ProdutoController = {
     } catch (err) {
       console.error('❌ Erro ao buscar produto:', err.message);
       return jsonError(res, err.message || 'Erro ao buscar produto', 500);
+    }
+  },
+
+  // Adaptadores para manter compatibilidade com as rotas antigas
+  async listar(req, res) {
+    return this.getAllProdutos(req, res);
+  },
+
+  async obter(req, res) {
+    return this.getProdutoById(req, res);
+  },
+
+  async criar(req, res) {
+    try {
+      const { nome, preco, imagem } = req.body || {};
+      const produto = await produtoService.createProduto(nome, parseFloat(preco), imagem || null);
+      return jsonSuccess(res, { data: produto }, 'produto criado', 201);
+    } catch (err) {
+      console.error('❌ Erro ao criar produto:', err.message);
+      return jsonError(res, err.message || 'Erro ao criar produto', 500);
+    }
+  },
+
+  async atualizar(req, res) {
+    try {
+      const { id } = req.params;
+      const { nome, preco, imagem } = req.body || {};
+      const updated = await produtoService.updateProduto(parseInt(id), nome, parseFloat(preco), imagem || null);
+      return jsonSuccess(res, { data: updated }, 'produto atualizado');
+    } catch (err) {
+      console.error('❌ Erro ao atualizar produto:', err.message);
+      return jsonError(res, err.message || 'Erro ao atualizar produto', 500);
+    }
+  },
+
+  async deletar(req, res) {
+    try {
+      const { id } = req.params;
+      const result = await produtoService.deleteProduto(parseInt(id));
+      return jsonSuccess(res, { data: result }, 'produto deletado');
+    } catch (err) {
+      console.error('❌ Erro ao deletar produto:', err.message);
+      return jsonError(res, err.message || 'Erro ao deletar produto', 500);
     }
   }
 };
