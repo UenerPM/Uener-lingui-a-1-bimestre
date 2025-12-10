@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const authCtrl = require('../controllers/authController-avap2');
-const produtoCtrl = require('../controllers/produtoController-avap2');
-const pedidoCtrl = require('../controllers/pedidoController-avap2');
-const pagamentoCtrl = require('../controllers/pagamentoController-avap2');
+const authCtrl = require('../controllers/authController');
+const produtoCtrl = require('../controllers/produtoController');
+const pedidoCtrl = require('../controllers/pedidoController');
+const pagamentoCtrl = require('../controllers/pagamentoController');
 const imagemCtrl = require('../controllers/imagemController');
 const linguicasPublicCtrl = require('../controllers/linguicasPublicController');
 const { requireLogin } = require('../middleware/auth');

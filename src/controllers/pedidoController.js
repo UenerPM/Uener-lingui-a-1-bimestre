@@ -1,118 +1,71 @@
-/**
- * PEDIDO CONTROLLER
- * Lógica de negócio para gerenciar pedidos
- */
-
-const pedidoRepo = require('../repositories/pedidoRepository');
-
-function jsonSuccess(res, data = {}, message = 'OK', statusCode = 200) {
-  return res.status(statusCode).json({ success: true, message, ...data });
-}
+const pedidoRepo = require('../repositories/pedidoRepository-avap2');
+const produtoRepo = require('../repositories/produtoRepository-avap2');
+const pool = require('../config/db');
+const funcionarioRepo = require('../repositories/funcionarioRepository');
+const pedidoService = require('../services/pedidoService');
 
 function jsonError(res, message = 'Erro', statusCode = 400) {
   return res.status(statusCode).json({ success: false, message });
 }
 
+function jsonSuccess(res, data = {}, message = 'OK', statusCode = 200) {
+  return res.status(statusCode).json({ success: true, message, ...data });
+}
+
 const PedidoController = {
   /**
-   * GET /api/pedidos
-   * Listar meus pedidos (usuário logado)
-   */
-  async listar(req, res) {
-    try {
-      const username = req.session.user.username;
-      const pedidos = await pedidoRepo.getPedidosByUser(username);
-      return jsonSuccess(res, { data: pedidos }, 'pedidos listados');
-    } catch (err) {
-      console.error('❌ Erro ao listar pedidos:', err.message);
-      return jsonError(res, 'Erro ao listar pedidos', 500);
-    }
-  },
-
-  /**
-   * GET /api/pedidos-admin
-   * Listar todos os pedidos (admin only)
-   */
-  async listarTodos(req, res) {
-    try {
-      const pedidos = await pedidoRepo.getAllPedidos();
-      return jsonSuccess(res, { data: pedidos }, 'pedidos listados (admin)');
-    } catch (err) {
-      console.error('❌ Erro ao listar pedidos:', err.message);
-      return jsonError(res, 'Erro ao listar pedidos', 500);
-    }
-  },
-
-  /**
-   * GET /api/pedidos/:id
-   * Obter um pedido
-   */
-  async obter(req, res) {
-    try {
-      const { id } = req.params;
-
-      if (!id || isNaN(id)) {
-        return jsonError(res, 'ID do pedido inválido', 400);
-      }
-
-      const pedido = await pedidoRepo.getPedidoById(parseInt(id));
-
-      if (!pedido) {
-        return jsonError(res, 'Pedido não encontrado', 404);
-      }
-
-      // Se é usuário comum, só pode ver seus próprios pedidos (compara CPF)
-      if (!req.session.user.isAdmin) {
-        const pessoa = await pedidoRepo.findPessoaByUsername(req.session.user.username);
-        const cpf = pessoa ? pessoa.cpf : null;
-        if (!cpf || pedido.cliente_cpf !== cpf) {
-          return jsonError(res, 'Acesso negado', 403);
-        }
-      }
-
-      return jsonSuccess(res, { data: pedido }, 'pedido obtido');
-    } catch (err) {
-      console.error('❌ Erro ao obter pedido:', err.message);
-      return jsonError(res, 'Erro ao obter pedido', 500);
-    }
-  },
-
-  /**
    * POST /api/pedidos
-   * Criar novo pedido (usuário logado)
+   * Cria um novo pedido com itens
+   * Body: { itens: [ { idproduto, quantidade }, ... ], total }
    */
-  async criar(req, res) {
+  async createPedido(req, res) {
     try {
-      const { cliente_id, cliente_cpf, itens, observacoes } = req.body;
-      const username = req.session.user.username;
+      if (!req.session || !req.session.user) {
+        return jsonError(res, 'Usuário não autenticado', 401);
+      }
 
-      // Validações
+      const { itens, total } = req.body || {};
+      const cpfpessoa = req.session.user.cpfpessoa;
+
       if (!itens || !Array.isArray(itens) || itens.length === 0) {
-        return jsonError(res, 'Pedido deve ter ao menos 1 item', 400);
+        return jsonError(res, 'Itens do pedido são obrigatórios', 400);
       }
 
-      for (const item of itens) {
-        if (!item.quantidade || item.quantidade < 1) {
-          return jsonError(res, 'Quantidade deve ser maior que 0', 400);
-        }
-        if (!item.preco_unitario || item.preco_unitario <= 0) {
-          return jsonError(res, 'Preço unitário deve ser positivo', 400);
-        }
-        if (!item.produto_id && !item.linguica_id) {
-          return jsonError(res, 'Cada item deve ter produto_id ou linguica_id', 400);
-        }
+      if (!total || total <= 0) {
+        return jsonError(res, 'Total do pedido inválido', 400);
       }
 
-      // Determina CPF do cliente: aceita `cliente_cpf` no body, ou tenta inferir pela sessão
-      let cpfParaPedido = cliente_cpf || null;
-      if (!cpfParaPedido) {
-        const pessoa = await pedidoRepo.findPessoaByUsername(username);
-        cpfParaPedido = pessoa ? pessoa.cpf : null;
+      // Criar pedido
+      // Selecionar atendente ativo aleatoriamente (compatível com variações de schema)
+      async function getActiveFuncionariosList(client) {
+        try {
+          const r = await client.query('SELECT cpf FROM funcionarios WHERE deleted_at IS NULL');
+          if (r && r.rowCount > 0) return r.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const r2 = await client.query('SELECT pessoacpfpessoa as cpf FROM funcionario');
+          if (r2 && r2.rowCount > 0) return r2.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const fr = await funcionarioRepo.getAllFuncionarios();
+          if (Array.isArray(fr) && fr.length > 0) return fr.map(f => f.cpf || f.pessoacpfpessoa || f.cpfpessoa);
+        } catch (e) {}
+        return [];
       }
 
-      const pedido = await pedidoRepo.createPedido(username, cpfParaPedido, itens, observacoes || null);
-
-      return jsonSuccess(res, { data: pedido }, 'pedido criado', 201);
+      // Usar service para criar pedido com itens (seleção de atendente já ocorrida no service)
+      try {
+        const pedidoCriado = await pedidoService.createPedidoWithItems(cpfpessoa, itens, total, null);
+        return jsonSuccess(
+          res,
+          { pedido: pedidoCriado },
+          'Pedido criado com sucesso',
+          201
+        );
+      } catch (err) {
+        console.error('❌ Erro ao criar pedido via service:', err.message);
+        return jsonError(res, err.message || 'Erro ao criar pedido', 500);
+      }
     } catch (err) {
       console.error('❌ Erro ao criar pedido:', err.message);
       return jsonError(res, err.message || 'Erro ao criar pedido', 500);
@@ -120,63 +73,58 @@ const PedidoController = {
   },
 
   /**
-   * PUT /api/pedidos/:id
-   * Atualizar pedido (status)
+   * GET /api/pedidos
+   * Lista pedidos do usuário logado
    */
-  async atualizar(req, res) {
+  async getPedidosUsuario(req, res) {
     try {
-      const { id } = req.params;
-      const { status, observacoes } = req.body;
-
-      if (!id || isNaN(id)) {
-        return jsonError(res, 'ID do pedido inválido', 400);
+      if (!req.session || !req.session.user) {
+        return jsonError(res, 'Usuário não autenticado', 401);
       }
 
-      if (!status) {
-        return jsonError(res, 'Status é obrigatório', 400);
+      const cpfpessoa = req.session.user.cpfpessoa;
+      const pedidos = await pedidoRepo.getPedidosPorPessoa(cpfpessoa);
+
+      // Para cada pedido, buscar seus itens
+      for (const p of pedidos) {
+        p.itens = await pedidoRepo.getItensPedido(p.idpedido);
       }
 
-      const pedido = await pedidoRepo.updatePedidoStatus(parseInt(id), status);
-
-      return jsonSuccess(res, { data: pedido }, 'pedido atualizado');
+      return jsonSuccess(res, { data: pedidos }, 'Pedidos listados', 200);
     } catch (err) {
-      console.error('❌ Erro ao atualizar pedido:', err.message);
-
-      if (err.message.includes('não encontrado')) {
-        return jsonError(res, err.message, 404);
-      }
-
-      if (err.message.includes('inválido')) {
-        return jsonError(res, err.message, 400);
-      }
-
-      return jsonError(res, err.message || 'Erro ao atualizar pedido', 500);
+      console.error('❌ Erro ao listar pedidos:', err.message);
+      return jsonError(res, err.message || 'Erro ao listar pedidos', 500);
     }
   },
 
   /**
-   * DELETE /api/pedidos/:id
-   * Deletar pedido (admin only)
+   * GET /api/pedidos/:id
+   * Busca um pedido específico
    */
-  async deletar(req, res) {
+  async getPedidoById(req, res) {
     try {
       const { id } = req.params;
+      if (!id) return jsonError(res, 'ID do pedido é obrigatório', 400);
 
-      if (!id || isNaN(id)) {
-        return jsonError(res, 'ID do pedido inválido', 400);
+      const pedido = await pedidoRepo.getPedidoById(parseInt(id));
+
+      if (!pedido) {
+        return jsonError(res, 'Pedido não encontrado', 404);
       }
 
-      const pedido = await pedidoRepo.deletePedido(parseInt(id));
+      // Verificar se o usuário tem permissão para ver este pedido
+      // Campo real no banco é `clientepessoacpfpessoa`
+      if (req.session && req.session.user && req.session.user.cpfpessoa !== pedido.clientepessoacpfpessoa && !req.session.user.isAdmin) {
+        return jsonError(res, 'Acesso negado', 403);
+      }
 
-      return jsonSuccess(res, { data: pedido }, 'pedido deletado');
+      const itens = await pedidoRepo.getItensPedido(pedido.idpedido);
+      pedido.itens = itens;
+
+      return jsonSuccess(res, { data: pedido }, 'Pedido encontrado', 200);
     } catch (err) {
-      console.error('❌ Erro ao deletar pedido:', err.message);
-
-      if (err.message.includes('não encontrado')) {
-        return jsonError(res, err.message, 404);
-      }
-
-      return jsonError(res, err.message || 'Erro ao deletar pedido', 500);
+      console.error('❌ Erro ao buscar pedido:', err.message);
+      return jsonError(res, err.message || 'Erro ao buscar pedido', 500);
     }
   }
 };

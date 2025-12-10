@@ -1,0 +1,291 @@
+{
+  "total_files": 57,
+  "files_with_requires": 46,
+  "potential_issues": [
+    {
+      "file": "src\\repositories\\linguicaRepository-sqlite.js",
+      "require": "../config/db-sqlite",
+      "issues": [
+        "ERRO: Arquivo não encontrado: C:\\Users\\upere\\Uener-lingui-a-1-bimestre\\src\\config\\db-sqlite"
+      ]
+    },
+    {
+      "file": "src\\repositories\\userRepository-sqlite.js",
+      "require": "../config/db-sqlite",
+      "issues": [
+        "ERRO: Arquivo não encontrado: C:\\Users\\upere\\Uener-lingui-a-1-bimestre\\src\\config\\db-sqlite"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/authController-avap2",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/produtoController-avap2",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/pedidoController-avap2",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/pagamentoController-avap2",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/imagemController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\api-avap2.js",
+      "require": "../controllers/linguicasPublicController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\clienteRoutes.js",
+      "require": "../controllers/clienteController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\funcionarioRoutes.js",
+      "require": "../controllers/funcionarioController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\linguicaRoutes.js",
+      "require": "../controllers/linguicaController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\pedidoRoutes.js",
+      "require": "../controllers/pedidoController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\produtoRoutes.js",
+      "require": "../controllers/produtoController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    },
+    {
+      "file": "src\\routes\\userRoutes.js",
+      "require": "../controllers/userController",
+      "issues": [
+        "AVISO: Pode precisar de refatoração após mover controllers"
+      ]
+    }
+  ],
+  "requires_by_pattern": {
+    "pg": [
+      "src\\config\\db.js",
+      "src\\database\\setup.js"
+    ],
+    "dotenv": [
+      "src\\config\\index.js",
+      "src\\database\\setup.js"
+    ],
+    "./db": [
+      "src\\config\\index.js"
+    ],
+    "../repositories/authRepository-avap2": [
+      "src\\controllers\\authController-avap2.js"
+    ],
+    "../repositories/clienteRepository": [
+      "src\\controllers\\clienteController.js"
+    ],
+    "../repositories/funcionarioRepository": [
+      "src\\controllers\\funcionarioController.js",
+      "src\\controllers\\pedidoController-avap2.js",
+      "src\\routes\\payment.js"
+    ],
+    "fs": [
+      "src\\controllers\\imagemController.js",
+      "src\\controllers\\imagemController.js",
+      "src\\database\\setup-sqlite.js",
+      "src\\database\\setup.js",
+      "src\\routes\\imagem.js",
+      "src\\routes\\imagensProdutos.js"
+    ],
+    "path": [
+      "src\\controllers\\imagemController.js",
+      "src\\database\\setup-sqlite.js",
+      "src\\database\\setup.js",
+      "src\\routes\\imagem.js",
+      "src\\routes\\imagensProdutos.js"
+    ],
+    "../config/db": [
+      "src\\controllers\\imagemController.js",
+      "src\\controllers\\linguicasPublicController.js",
+      "src\\controllers\\pedidoController-avap2.js",
+      "src\\repositories\\authRepository-avap2.js",
+      "src\\repositories\\authRepository.js",
+      "src\\repositories\\clienteRepository.js",
+      "src\\repositories\\funcionarioRepository.js",
+      "src\\repositories\\linguicaRepository.js",
+      "src\\repositories\\pagamentoRepository-avap2.js",
+      "src\\repositories\\pedidoRepository-avap2.js",
+      "src\\repositories\\pedidoRepository.js",
+      "src\\repositories\\produtoRepository-avap2.js",
+      "src\\repositories\\produtoRepository.js",
+      "src\\repositories\\userRepository.js",
+      "src\\routes\\payment.js"
+    ],
+    "../repositories/produtoRepository": [
+      "src\\controllers\\linguicaController.js",
+      "src\\controllers\\produtoController.js"
+    ],
+    "../repositories/pagamentoRepository-avap2": [
+      "src\\controllers\\pagamentoController-avap2.js",
+      "src\\services\\pagamentoService.js"
+    ],
+    "../repositories/pedidoRepository-avap2": [
+      "src\\controllers\\pagamentoController-avap2.js",
+      "src\\controllers\\pedidoController-avap2.js",
+      "src\\services\\pagamentoService.js",
+      "src\\services\\pedidoService.js"
+    ],
+    "../services/pagamentoService": [
+      "src\\controllers\\pagamentoController-avap2.js"
+    ],
+    "../repositories/produtoRepository-avap2": [
+      "src\\controllers\\pedidoController-avap2.js",
+      "src\\controllers\\produtoController-avap2.js",
+      "src\\services\\pedidoService.js"
+    ],
+    "../services/pedidoService": [
+      "src\\controllers\\pedidoController-avap2.js"
+    ],
+    "../repositories/pedidoRepository": [
+      "src\\controllers\\pedidoController.js"
+    ],
+    "./imagemController": [
+      "src\\controllers\\produtoController.js"
+    ],
+    "../repositories/userRepository": [
+      "src\\controllers\\userController.js"
+    ],
+    "../repositories/authRepository": [
+      "src\\controllers\\userController.js"
+    ],
+    "sqlite3": [
+      "src\\database\\setup-sqlite.js"
+    ],
+    "bcryptjs": [
+      "src\\database\\setup-sqlite.js",
+      "src\\repositories\\authRepository.js",
+      "src\\repositories\\userRepository-sqlite.js",
+      "src\\repositories\\userRepository.js"
+    ],
+    "crypto": [
+      "src\\lib\\pix.js"
+    ],
+    "../config/db-sqlite": [
+      "src\\repositories\\linguicaRepository-sqlite.js",
+      "src\\repositories\\userRepository-sqlite.js"
+    ],
+    "../config/schemaMap": [
+      "src\\repositories\\pedidoRepository.js",
+      "src\\repositories\\produtoRepository.js"
+    ],
+    "express": [
+      "src\\routes\\api-avap2.js",
+      "src\\routes\\clienteRoutes.js",
+      "src\\routes\\funcionarioRoutes.js",
+      "src\\routes\\imagem.js",
+      "src\\routes\\imagensProdutos.js",
+      "src\\routes\\linguicaRoutes.js",
+      "src\\routes\\payment.js",
+      "src\\routes\\pedidoRoutes.js",
+      "src\\routes\\pix.js",
+      "src\\routes\\produtoRoutes.js",
+      "src\\routes\\sessionRoute.js",
+      "src\\routes\\userRoutes.js"
+    ],
+    "../controllers/authController-avap2": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../controllers/produtoController-avap2": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../controllers/pedidoController-avap2": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../controllers/pagamentoController-avap2": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../controllers/imagemController": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../controllers/linguicasPublicController": [
+      "src\\routes\\api-avap2.js"
+    ],
+    "../middleware/auth": [
+      "src\\routes\\api-avap2.js",
+      "src\\routes\\clienteRoutes.js",
+      "src\\routes\\funcionarioRoutes.js",
+      "src\\routes\\linguicaRoutes.js",
+      "src\\routes\\pedidoRoutes.js",
+      "src\\routes\\produtoRoutes.js",
+      "src\\routes\\userRoutes.js"
+    ],
+    "../controllers/clienteController": [
+      "src\\routes\\clienteRoutes.js"
+    ],
+    "../controllers/funcionarioController": [
+      "src\\routes\\funcionarioRoutes.js"
+    ],
+    "mime-types": [
+      "src\\routes\\imagem.js",
+      "src\\routes\\imagensProdutos.js"
+    ],
+    "./legacy/index": [
+      "src\\routes\\index.js"
+    ],
+    "../controllers/linguicaController": [
+      "src\\routes\\linguicaRoutes.js"
+    ],
+    "../lib/pix": [
+      "src\\routes\\payment.js",
+      "src\\routes\\pix.js"
+    ],
+    "../controllers/pedidoController": [
+      "src\\routes\\pedidoRoutes.js"
+    ],
+    "../controllers/produtoController": [
+      "src\\routes\\produtoRoutes.js"
+    ],
+    "../controllers/userController": [
+      "src\\routes\\userRoutes.js"
+    ],
+    "util": [
+      "src\\utils\\logger.js"
+    ]
+  },
+  "timestamp": "2025-12-10T01:21:02.920Z"
+}
