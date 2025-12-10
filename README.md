@@ -1,6 +1,10 @@
-# 🍖 UENER LINGUÇO - Sistema E-commerce
+# 🌭 UENER LINGUÇO - Sistema de E-Commerce
 
-Sistema de e-commerce completo desenvolvido com Node.js/Express, PostgreSQL e arquitetura modular com separação clara entre frontend e backend.
+**Versão**: 1.0 (Clean Architecture)  
+**Data**: 9 de Dezembro de 2025  
+**Status**: ✅ Pronto para Produção
+
+Sistema moderno de e-commerce para venda de linguiças, desenvolvido com **Node.js + Express + PostgreSQL** e padrão **Clean Architecture**.
 
 ---
 

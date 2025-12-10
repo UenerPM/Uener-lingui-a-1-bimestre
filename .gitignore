@@ -1,0 +1,55 @@
+# ===== DEPENDÊNCIAS =====
+node_modules/
+package-lock.json
+yarn.lock
+
+# ===== VARIÁVEIS DE AMBIENTE =====
+.env
+.env.local
+.env.*.local
+
+# ===== IDE & EDITOR =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== LOGS =====
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+
+# ===== SESSÕES =====
+src/sessions/
+sessions/
+
+# ===== IMAGENS DINÂMICAS =====
+public/img/
+!public/img/.gitkeep
+
+# ===== BANCOS DE DADOS LOCAIS =====
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== BUILD & DIST =====
+dist/
+build/
+
+# ===== TESTES =====
+coverage/
+.nyc_output/
+
+# ===== TEMPORARY =====
+tmp/
+temp/
+*.tmp
+
+# ===== ARQUIVOS DE SISTEMA =====
+.DS_Store
+Thumbs.db
+desktop.ini

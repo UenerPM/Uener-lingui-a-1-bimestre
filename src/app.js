@@ -17,20 +17,20 @@ const SessionFileStore = require('session-file-store')(session);
 let SessionStore = null;
 
 // Config
-const pool = require('./src/config/db');
+const pool = require('./config/db');
 
 // Routes
-const userRoutes = require('./src/routes/userRoutes');
-const linguicaRoutes = require('./src/routes/linguicaRoutes');
-const produtoRoutes = require('./src/routes/produtoRoutes');
-const pedidoRoutes = require('./src/routes/pedidoRoutes');
-const clienteRoutes = require('./src/routes/clienteRoutes');
-const funcionarioRoutes = require('./src/routes/funcionarioRoutes');
-const sessionRoute = require('./src/routes/sessionRoute');
-const apiAvap2 = require('./src/routes/api-avap2'); // Novas rotas para avap2
-const pixRoutes = require('./src/routes/pix');
-const imagensProdutos = require('./src/routes/imagensProdutos');
-const imagemRoute = require('./src/routes/imagem');
+const userRoutes = require('./routes/userRoutes');
+const linguicaRoutes = require('./routes/linguicaRoutes');
+const produtoRoutes = require('./routes/produtoRoutes');
+const pedidoRoutes = require('./routes/pedidoRoutes');
+const clienteRoutes = require('./routes/clienteRoutes');
+const funcionarioRoutes = require('./routes/funcionarioRoutes');
+const sessionRoute = require('./routes/sessionRoute');
+const apiAvap2 = require('./routes/api-avap2'); // Novas rotas para avap2
+const pixRoutes = require('./routes/pix');
+const imagensProdutos = require('./routes/imagensProdutos');
+const imagemRoute = require('./routes/imagem');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -1,18 +1,21 @@
-// Importa o módulo Express, que facilita a criação de servidores web em Node.js
-const express = require('express');
+/**
+ * Entry Point Principal
+ * Inicia o servidor a partir de src/app.js
+ */
 
-// Cria uma instância do aplicativo Express
-const app = express();
+require('dotenv').config();
+const app = require('./src/app');
 
-// Define a porta na qual o servidor irá escutar
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Rota de exemplo: responde com uma mensagem quando acessar http://localhost:3000/
-app.get('/', (req, res) => {
-  res.send('Servidor funcionando!');
+app.listen(PORT, () => {
+  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+  console.log(`📁 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🗄️  Banco: avap2 (PostgreSQL)`);
 });
 
-// Inicia o servidor e exibe uma mensagem no console quando estiver pronto
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n⛔ Servidor encerrado');
+  process.exit(0);
 });

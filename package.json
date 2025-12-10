@@ -2,14 +2,14 @@
   "name": "uener-linguica",
   "version": "1.0.0",
   "description": "E-commerce sistema completo: Node.js + Express + PostgreSQL",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "setup-db": "node src/database/setup.js",
-    "start": "node app.js",
-    "dev": "nodemon app.js --ignore public",
-    "test:login": "curl -X POST http://localhost:3000/api/login -H 'Content-Type: application/json' -d '{\"username\":\"adm\",\"password\":\"123\"}'",
-    "test:session": "curl -X GET http://localhost:3000/api/session",
-    "test:produtos": "curl -X GET http://localhost:3000/api/produtos"
+    "start": "node index.js",
+    "dev": "nodemon index.js --ignore public --ignore src/sessions",
+    "setup": "node src/database/setup.js",
+    "analyze": "node scripts/check_requires.js",
+    "report": "node scripts/report_structure.js",
+    "test:api": "curl http://localhost:3000/api/produtos"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
