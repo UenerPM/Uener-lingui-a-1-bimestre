@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const funcionarioRepo = require('../repositories/funcionarioRepository');
 const { gerarPayloadPix, gerarQRCodePix, validarPayloadPix, gerarRespostaPix } = require('../lib/pix');
 
 function log(msg) {
@@ -170,10 +171,80 @@ router.post('/pedidos', express.json(), async (req, res) => {
   if (!sessionUser) return res.status(401).json({ success:false, message: 'Login requerido' });
 
   const clientCpf = sessionUser.cpfpessoa;
-  const funcionarioCpf = (sessionUser.userType === 'funcionario' || sessionUser.role === 'funcionario') ? sessionUser.cpfpessoa : null;
+  const isFuncionarioUser = sessionUser.userType === 'funcionario' || sessionUser.role === 'funcionario' || sessionUser.isAdmin;
+  let funcionarioCpf = isFuncionarioUser ? sessionUser.cpfpessoa : null;
 
   const client = await pool.connect();
   try {
+    // Helpers locais para compatibilidade com variações de schema
+    async function isFuncionarioActive(cpf) {
+      if (!cpf) return false;
+      try {
+        // Tentar tabela `funcionarios` (plural) com coluna `cpf` e `deleted_at`
+        const r1 = await client.query('SELECT cpf FROM funcionarios WHERE cpf=$1 AND deleted_at IS NULL', [cpf]);
+        if (r1 && r1.rowCount > 0) return true;
+      } catch (e) {
+        // ignore - tabela pode não existir
+      }
+      try {
+        // Tentar tabela `funcionario` (singular) com coluna `pessoacpfpessoa`
+        const r2 = await client.query('SELECT pessoacpfpessoa FROM funcionario WHERE pessoacpfpessoa=$1', [cpf]);
+        if (r2 && r2.rowCount > 0) return true;
+      } catch (e) {
+        // ignore
+      }
+      return false;
+    }
+
+    async function getActiveFuncionariosList() {
+      // Retornar array de { cpf }
+      try {
+        const r = await client.query('SELECT cpf FROM funcionarios WHERE deleted_at IS NULL');
+        if (r && r.rowCount > 0) return r.rows.map(row => ({ cpf: row.cpf }));
+      } catch (e) {
+        // tabela pode não existir, tentar singular
+      }
+      try {
+        const r2 = await client.query('SELECT pessoacpfpessoa as cpf FROM funcionario');
+        if (r2 && r2.rowCount > 0) return r2.rows.map(row => ({ cpf: row.cpf }));
+      } catch (e) {
+        // ignore
+      }
+      // Fallback para usar o repositório (se implementado) — pode lançar
+      try {
+        const funcs = await funcionarioRepo.getAllFuncionarios();
+        if (Array.isArray(funcs)) return funcs.map(f => ({ cpf: f.cpf || f.pessoacpfpessoa || f.cpfpessoa }));
+      } catch (e) {
+        console.error('[pedidos] erro ao obter lista de funcionarios via repo', e.message || e);
+      }
+      return [];
+    }
+
+    // Garantir que, se a sessão for de funcionário, ele esteja ativo.
+    if (isFuncionarioUser && funcionarioCpf) {
+      const active = await isFuncionarioActive(funcionarioCpf);
+      if (!active) {
+        console.log('[pedidos] funcionário da sessão está inativo; não será atribuído ao pedido');
+        funcionarioCpf = null; // forçar seleção aleatória
+      }
+    }
+
+    // Se não houver um funcionário definido, obter lista de funcionários ativos
+    if (!funcionarioCpf) {
+      try {
+        const funcionarios = await getActiveFuncionariosList();
+        if (Array.isArray(funcionarios) && funcionarios.length > 0) {
+          const rand = Math.floor(Math.random() * funcionarios.length);
+          funcionarioCpf = funcionarios[rand].cpf;
+          console.log('[pedidos] atendente aleatório selecionado cpf=', funcionarioCpf);
+        } else {
+          console.log('[pedidos] nenhum funcionário ativo disponível para atribuir ao pedido');
+        }
+      } catch (selErr) {
+        console.error('[pedidos] erro ao selecionar atendente aleatório', selErr);
+      }
+    }
+
     await client.query('BEGIN');
     const insertPedido = 'INSERT INTO pedido (datadopedido, clientepessoacpfpessoa, funcionariopessoacpfpessoa) VALUES (CURRENT_DATE, $1, $2) RETURNING idpedido';
     const pRes = await client.query(insertPedido, [clientCpf, funcionarioCpf]);
@@ -244,6 +315,31 @@ router.post('/pagamentos', express.json(), async (req, res) => {
     }
     
     log(`[TX] ✓ Pedido encontrado`);
+
+    // Verificar ownership do pedido
+    const pedido = pRes.rows[0];
+    const sessionUser = req.session && req.session.user;
+    
+    if (!sessionUser) {
+      await client.query('ROLLBACK');
+      logError(`Usuário não autenticado`);
+      return res.status(401).json({ success:false, message: 'Login requerido' });
+    }
+
+    const userCpf = sessionUser.cpfpessoa || sessionUser.username;
+    const pedidoOwner = pedido.clientepessoacpfpessoa;
+    
+    log(`[TX] Validando ownership: pedido owner='${pedidoOwner}' vs user='${userCpf}'`);
+    
+    const isOwnerOrAdmin = String(pedidoOwner).trim() === String(userCpf).trim() || sessionUser.isAdmin;
+    
+    if (!isOwnerOrAdmin) {
+      await client.query('ROLLBACK');
+      logError(`Acesso negado: pedido ${pedidoIdNum} não pertence ao usuário ${userCpf}`);
+      return res.status(403).json({ success:false, message: 'Acesso negado a este pedido' });
+    }
+    
+    log(`[TX] ✓ Ownership validado`);
     
     // Verificar forma
     log(`[TX] Verificando forma ${formaIdNum}...`);

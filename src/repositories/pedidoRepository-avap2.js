@@ -5,7 +5,7 @@ const pool = require('../config/db');
  * Repositório para pedidos e itens de pedido (pedidohasproduto)
  */
 
-async function createPedido(cpfpessoa, totalvalue) {
+async function createPedido(cpfpessoa, totalvalue, status = 'pendente', funcionarioCpf = null) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -13,9 +13,9 @@ async function createPedido(cpfpessoa, totalvalue) {
     // Criar pedido com data de hoje
     const pedidoRes = await client.query(
       `INSERT INTO pedido (datadopedido, clientepessoacpfpessoa, funcionariopessoacpfpessoa)
-       VALUES (NOW()::date, $1, $1)
-       RETURNING idpedido, datadopedido, clientepessoacpfpessoa`,
-      [cpfpessoa]
+       VALUES (NOW()::date, $1, $2)
+       RETURNING idpedido, datadopedido, clientepessoacpfpessoa, funcionariopessoacpfpessoa`,
+      [cpfpessoa, funcionarioCpf]
     );
 
     const pedido = pedidoRes.rows[0];
@@ -50,7 +50,7 @@ async function addItemToPedido(idpedido, idproduto, quantidade, preco_unitario) 
 async function getPedidoById(idpedido) {
   try {
     const res = await pool.query(
-      `SELECT p.idpedido, p.clientepessoacpfpessoa, p.datadopedido
+      `SELECT p.idpedido, p.clientepessoacpfpessoa, p.funcionariopessoacpfpessoa, p.datadopedido
        FROM pedido p
        WHERE p.idpedido = $1`,
       [idpedido]

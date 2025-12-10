@@ -1,5 +1,7 @@
 const pedidoRepo = require('../repositories/pedidoRepository-avap2');
 const produtoRepo = require('../repositories/produtoRepository-avap2');
+const pool = require('../config/db');
+const funcionarioRepo = require('../repositories/funcionarioRepository');
 
 function jsonError(res, message = 'Erro', statusCode = 400) {
   return res.status(statusCode).json({ success: false, message });
@@ -33,7 +35,38 @@ const PedidoController = {
       }
 
       // Criar pedido
-      const pedido = await pedidoRepo.createPedido(cpfpessoa, total, 'pendente');
+      // Selecionar atendente ativo aleatoriamente (compatível com variações de schema)
+      async function getActiveFuncionariosList(client) {
+        try {
+          const r = await client.query('SELECT cpf FROM funcionarios WHERE deleted_at IS NULL');
+          if (r && r.rowCount > 0) return r.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const r2 = await client.query('SELECT pessoacpfpessoa as cpf FROM funcionario');
+          if (r2 && r2.rowCount > 0) return r2.rows.map(rw => rw.cpf);
+        } catch (e) {}
+        try {
+          const fr = await funcionarioRepo.getAllFuncionarios();
+          if (Array.isArray(fr) && fr.length > 0) return fr.map(f => f.cpf || f.pessoacpfpessoa || f.cpfpessoa);
+        } catch (e) {}
+        return [];
+      }
+
+      const client = await pool.connect();
+      let funcionarioCpf = null;
+      try {
+        const list = await getActiveFuncionariosList(client);
+        if (list.length > 0) {
+          funcionarioCpf = list[Math.floor(Math.random() * list.length)];
+        } else {
+          // Nenhum atendente ativo disponível — não criar pedido
+          return jsonError(res, 'Nenhum atendente ativo disponível para atender o pedido', 503);
+        }
+      } finally {
+        client.release();
+      }
+
+      const pedido = await pedidoRepo.createPedido(cpfpessoa, total, 'pendente', funcionarioCpf);
 
       // Adicionar itens
       for (const item of itens) {

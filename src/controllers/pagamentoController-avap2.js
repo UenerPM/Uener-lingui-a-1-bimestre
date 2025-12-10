@@ -220,12 +220,19 @@ const PagamentoController = {
       log(`✓ Pedido encontrado: ${pedido.numero_pedido || `ID ${idPedido}`}`);
 
       // ===== VALIDAÇÃO 8: VERIFICAR OWNERSHIP DO PEDIDO =====
-      const pedidoBelongsToUser = pedido.pessoaidpessoa === userId ||
-                                  pedido.user_id === userId ||
-                                  req.session.user.isAdmin;
+      const pedidoOwner = pedido.clientepessoacpfpessoa;
+
+      log(`Pedido ${idPedido} pertence a: '${pedidoOwner}' (length: ${String(pedidoOwner).length}); usuário atual: '${userId}' (length: ${String(userId).length})`);
+      log(`Pedido owner type: ${typeof pedidoOwner}, userId type: ${typeof userId}`);
+      log(`Pedido owner trimmed: '${String(pedidoOwner).trim()}'`);
+      log(`UserId trimmed: '${String(userId).trim()}'`);
+      log(`Comparação (===): ${String(pedidoOwner).trim() === String(userId).trim()}`);
+      log(`IsAdmin: ${req.session.user.isAdmin}`);
+
+      const pedidoBelongsToUser = String(pedidoOwner).trim() === String(userId).trim() || req.session.user.isAdmin;
 
       if (!pedidoBelongsToUser) {
-        logError(`Acesso negado: pedido ${idPedido} não pertence ao usuário ${userId}`);
+        logError(`Acesso negado: pedido ${idPedido} pertence a '${pedidoOwner}', não a '${userId}'`);
         return jsonError(res, 'Acesso negado a este pedido', 403);
       }
 
